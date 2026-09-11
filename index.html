@@ -329,21 +329,23 @@
   .sec-title { font-size: 11px; letter-spacing: .14em; color: var(--ink-3); margin: 0 0 10px; font-weight: 600; }
   .bins { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
   .bin {
+    position: relative;
     background: rgba(16, 28, 72, .35); border: 1px solid var(--line-soft); border-top: 3px solid var(--c);
     border-radius: 14px; padding: 12px 6px 10px; text-align: center;
     transition: transform .1s, background .2s;
   }
+  .bin:active { background: rgba(90, 200, 255, .1); }
+  .bin .chev { position: absolute; top: 8px; right: 7px; width: 14px; height: 14px; color: var(--ink-3); }
   .bin b { display: block; font-size: 26px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
   .bin span { display: block; font-size: 10.5px; color: var(--ink-2); margin-top: 6px; line-height: 1.3; }
-  .bin[aria-pressed="true"] { background: rgba(90, 200, 255, .1); border-color: var(--c); }
-  .binbar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: rgba(243, 246, 255, .08); margin-bottom: 8px; }
+  .binbar { display: flex; height: 6px; border-radius: 3px; overflow: hidden; background: rgba(243, 246, 255, .08); margin-bottom: 26px; }
   .binbar i { display: block; height: 100%; transition: width .4s var(--ease); }
   .binbar .ok { background: var(--ok); } .binbar .warn { background: var(--warn); } .binbar .no { background: var(--no); }
-  .binlist { list-style: none; margin: 0 0 26px; padding: 0; }
-  .binlist button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 4px; background: none; border: 0; border-bottom: 1px solid var(--line-soft); text-align: left; color: inherit; font-size: 14px; }
-  .binlist button b { font-weight: 600; }
-  .binlist button span { color: var(--ink-2); font-size: 12px; margin-left: auto; }
-  .binlist .empty { padding: 14px 0; }
+
+  /* My単語帳: label page (pushed over Profile, same template as Words) */
+  .view.page.on { animation: slideIn .32s var(--ease); }
+  .back { display: inline-flex; align-items: center; gap: 2px; background: none; border: 0; padding: 0; margin: 0 0 6px -4px; color: var(--cyan); font-size: 14px; font-weight: 600; }
+  .back svg { width: 18px; height: 18px; }
   .rows { margin-bottom: 26px; }
   .arow { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 2px; background: none; border: 0; border-bottom: 1px solid var(--line-soft); text-align: left; color: inherit; font-size: 14px; transition: transform .1s; }
   .arow .val { margin-left: auto; color: var(--ink-2); font-size: 13px; }
@@ -684,6 +686,7 @@
 
   @keyframes fade { from { opacity: 0; } }
   @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(36px); } }
   @keyframes beam { from { width: 0; opacity: 0; } }
   @keyframes ring { from { transform: scale(.9); opacity: .9; } to { transform: scale(1.6); opacity: 0; } }
   @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.25); } }
@@ -819,12 +822,11 @@
           </div>
           <p class="sec-title">MY単語帳</p>
           <div class="bins" role="group" aria-label="My単語帳">
-            <button class="bin" type="button" data-bin="ok" style="--c: var(--ok)" aria-pressed="true"><b id="c-ok">0</b><span>もう覚えた</span></button>
-            <button class="bin" type="button" data-bin="warn" style="--c: var(--warn)" aria-pressed="false"><b id="c-warn">0</b><span>もう少しで<br>覚えられそう</span></button>
-            <button class="bin" type="button" data-bin="no" style="--c: var(--no)" aria-pressed="false"><b id="c-no">0</b><span>全然<br>覚えてない</span></button>
+            <button class="bin" type="button" data-bin="ok" style="--c: var(--ok)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-ok">0</b><span>もう覚えた</span></button>
+            <button class="bin" type="button" data-bin="warn" style="--c: var(--warn)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-warn">0</b><span>もう少しで<br>覚えられそう</span></button>
+            <button class="bin" type="button" data-bin="no" style="--c: var(--no)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-no">0</b><span>全然<br>覚えてない</span></button>
           </div>
           <div class="binbar" aria-hidden="true"><i class="ok" id="bar-ok"></i><i class="warn" id="bar-warn"></i><i class="no" id="bar-no"></i></div>
-          <ul class="binlist" id="binlist"></ul>
           <p class="sec-title">アカウント</p>
           <div class="rows">
             <button class="arow" type="button" data-acct="名前"><span>名前</span><span class="val">さる単ユーザー</span><svg aria-hidden="true"><use href="#i-right"/></svg></button>
@@ -846,7 +848,27 @@
             </div>
           </div>
           <p class="dialect-note" id="dialect-sample"></p>
-          <p class="version">さる単 デモ v0.2</p>
+          <p class="version">さる単 デモ v0.3</p>
+        </section>
+
+        <!-- My単語帳: label page (same template as Words; title = label name) -->
+        <section class="view page" id="view-bin" aria-labelledby="h-bin">
+          <header class="view-head">
+            <button class="back" type="button" id="bin-back"><svg aria-hidden="true"><use href="#i-left"/></svg>Profile</button>
+            <h2 id="h-bin">もう覚えた</h2>
+            <p class="sub" id="bin-sub">0語</p>
+          </header>
+          <div class="search" id="bin-search">
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input type="search" id="bin-q" placeholder="単語・意味で検索" autocomplete="off" aria-label="単語を検索">
+            <button class="clear" type="button" id="bin-q-clear" aria-label="検索をクリア"><svg><use href="#i-close"/></svg></button>
+          </div>
+          <div class="sort" role="group" aria-label="並び順">
+            <button class="seg-btn" type="button" data-bsort="alpha" aria-pressed="true">A → Z</button>
+            <button class="seg-btn" type="button" data-bsort="freq" aria-pressed="false">動画で頻出順</button>
+          </div>
+          <ul class="wlist" id="binlist"></ul>
+          <p class="wlist-foot" id="bin-foot"></p>
         </section>
       </main>
 
@@ -1063,7 +1085,7 @@
 
   /* ---------- state + storage ---------- */
   const KEY = 'sarutan-demo:v1';
-  const state = { tab: 'words', sort: 'alpha', q: '', dialect: 'std', notify: true, ratings: {}, fav: {}, bin: 'ok' };
+  const state = { tab: 'words', sort: 'alpha', q: '', dialect: 'std', notify: true, ratings: {}, fav: {}, bin: 'ok', binSort: 'alpha', binQ: '' };
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
     if (saved.dialect) state.dialect = saved.dialect;
@@ -1118,35 +1140,38 @@
   $$('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
 
   /* ---------- Words ---------- */
-  const visibleWords = () => {
-    const q = state.q.trim().toLowerCase();
-    let list = WORDS.filter(w => !q || w.word.includes(q) || w.meaning.includes(q));
-    list = list.slice().sort((a, b) => state.sort === 'freq' ? b.freq - a.freq : a.word.localeCompare(b.word));
-    return list;
+  // Shared list template: Words and the My単語帳 label pages render the same rows.
+  const filterSort = (words, q, sort) => {
+    const k = q.trim().toLowerCase();
+    return words
+      .filter(w => !k || w.word.includes(k) || w.meaning.includes(k))
+      .sort((a, b) => sort === 'freq' ? b.freq - a.freq : a.word.localeCompare(b.word));
   };
-  const renderWords = () => {
-    const list = visibleWords();
-    const ul = $('#wlist');
-    if (!list.length) { ul.innerHTML = '<li class="empty">見つかりませんでした</li>'; return; }
+  const listHtml = (list, sort) => {
     let html = '', letter = '';
     list.forEach((w, i) => {
-      if (state.sort === 'alpha') {
+      if (sort === 'alpha') {
         const L = w.word[0].toUpperCase();
         if (L !== letter) { letter = L; html += `<li class="sec" aria-hidden="true">${L}</li>`; }
       }
       html += `<li><button class="wrow" type="button" data-open="${w.id}">
         <span class="th"><img src="${w.img}" alt=""></span>
-        <span>${state.sort === 'freq' ? `<span class="rank">${i + 1}</span>` : ''}<b>${esc(w.word)}</b><span class="m">${esc(w.meaning)}</span></span>
+        <span>${sort === 'freq' ? `<span class="rank">${i + 1}</span>` : ''}<b>${esc(w.word)}</b><span class="m">${esc(w.meaning)}</span></span>
         <span class="right"><span class="freq">動画 ${w.freq}回</span><i class="st ${state.ratings[w.id] || ''}" aria-hidden="true"></i></span>
       </button></li>`;
     });
-    ul.innerHTML = html;
+    return html;
+  };
+  const visibleWords = () => filterSort(WORDS.slice(), state.q, state.sort);
+  const renderWords = () => {
+    const list = visibleWords();
+    $('#wlist').innerHTML = list.length ? listHtml(list, state.sort) : '<li class="empty">見つかりませんでした</li>';
   };
   $('#q').addEventListener('input', e => { state.q = e.target.value; $('#search').classList.toggle('has', !!state.q); renderWords(); });
   $('#q-clear').addEventListener('click', () => { state.q = ''; $('#q').value = ''; $('#search').classList.remove('has'); renderWords(); $('#q').focus(); });
-  $$('.sort .seg-btn').forEach(b => b.addEventListener('click', () => {
+  $$('#view-words .sort .seg-btn').forEach(b => b.addEventListener('click', () => {
     state.sort = b.dataset.sort;
-    $$('.sort .seg-btn').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    $$('#view-words .sort .seg-btn').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     renderWords();
   }));
   $('#wlist').addEventListener('click', e => {
@@ -1163,19 +1188,46 @@
     const total = counts.ok + counts.warn + counts.no || 1;
     $('#c-ok').textContent = counts.ok; $('#c-warn').textContent = counts.warn; $('#c-no').textContent = counts.no;
     ['ok', 'warn', 'no'].forEach(k => { $('#bar-' + k).style.width = (counts[k] / total * 100) + '%'; });
-    $$('.bin').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.bin === state.bin)));
-    const items = WORDS.filter(w => state.ratings[w.id] === state.bin);
-    $('#binlist').innerHTML = items.length
-      ? items.map(w => `<li><button type="button" data-open="${w.id}"><i class="st ${state.bin}" aria-hidden="true"></i><b>${esc(w.word)}</b><span>${esc(w.meaning)}</span></button></li>`).join('')
-      : `<li class="empty">「${RATE_NAME[state.bin]}」はまだありません。Test で仕分けると入ります</li>`;
     $('#notify').setAttribute('aria-pressed', String(state.notify));
     $$('[data-dialect]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.dialect === state.dialect)));
     $('#dialect-sample').textContent = '例：' + byId('afford').tips[state.dialect];
   };
-  $$('.bin').forEach(b => b.addEventListener('click', () => { state.bin = b.dataset.bin; renderProfile(); }));
+
+  /* ---------- My単語帳: label page ---------- */
+  const binView = $('#view-bin');
+  const binAll = () => WORDS.filter(w => state.ratings[w.id] === state.bin);
+  const binWords = () => filterSort(binAll(), state.binQ, state.binSort);
+  const renderBin = () => {
+    const all = binAll();
+    const list = binWords();
+    $('#h-bin').textContent = RATE_NAME[state.bin];
+    $('#bin-sub').textContent = `${all.length}語`;
+    $$('[data-bsort]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.bsort === state.binSort)));
+    const ul = $('#binlist');
+    if (!all.length) ul.innerHTML = '<li class="empty">まだありません。Test で仕分けると、ここに入ります</li>';
+    else if (!list.length) ul.innerHTML = '<li class="empty">見つかりませんでした</li>';
+    else ul.innerHTML = listHtml(list, state.binSort);
+    $('#bin-foot').textContent = all.length ? '単語をタップすると単語ページが開きます' : '';
+  };
+  const openBin = label => {
+    state.bin = label; state.binQ = '';
+    $('#bin-q').value = ''; $('#bin-search').classList.remove('has');
+    renderBin();
+    $$('.view').forEach(v => v.classList.toggle('on', v === binView));
+    binView.scrollTop = 0;
+    buzz(6);
+  };
+  const closeBin = () => showTab('profile');
+  $$('.bin').forEach(b => b.addEventListener('click', () => openBin(b.dataset.bin)));
+  $('#bin-back').addEventListener('click', closeBin);
+  $('#bin-q').addEventListener('input', e => { state.binQ = e.target.value; $('#bin-search').classList.toggle('has', !!state.binQ); renderBin(); });
+  $('#bin-q-clear').addEventListener('click', () => { state.binQ = ''; $('#bin-q').value = ''; $('#bin-search').classList.remove('has'); renderBin(); $('#bin-q').focus(); });
+  $$('[data-bsort]').forEach(b => b.addEventListener('click', () => { state.binSort = b.dataset.bsort; renderBin(); }));
   $('#binlist').addEventListener('click', e => {
     const btn = e.target.closest('[data-open]');
-    if (btn) openDetail(WORDS, WORDS.findIndex(w => w.id === btn.dataset.open));
+    if (!btn) return;
+    const list = binWords();
+    openDetail(list, list.findIndex(w => w.id === btn.dataset.open));
   });
   $$('.arow').forEach(b => b.addEventListener('click', () => toast(`${b.dataset.acct}の変更はデモでは省略しています`)));
   $('#notify').addEventListener('click', () => { state.notify = !state.notify; save(); renderProfile(); toast(state.notify ? '通知をオンにしました' : '通知をオフにしました'); });
@@ -1386,7 +1438,12 @@
     showWord(Math.max(0, i));
     $('[data-act="close"]').focus({ preventScroll: true });
   };
-  const closeDetail = () => { clearTimers(); video.pause(); detailEl.hidden = true; detail.word = null; renderWords(); if (state.tab === 'profile') renderProfile(); };
+  const closeDetail = () => {
+    clearTimers(); video.pause(); detailEl.hidden = true; detail.word = null;
+    renderWords();
+    if (state.tab === 'profile') renderProfile();
+    if (binView.classList.contains('on')) renderBin();
+  };
 
   const setStage = s => {
     detail.stage = s;
@@ -1531,7 +1588,7 @@
     if (detail.stage !== 'card' && detail.stage !== 'network') advance();
   });
   document.addEventListener('keydown', e => {
-    if (detailEl.hidden) return;
+    if (detailEl.hidden) { if (e.key === 'Escape' && binView.classList.contains('on')) closeBin(); return; }
     if (e.key === 'Escape') closeDetail();
     else if (e.key === 'ArrowLeft') showWord(detail.i - 1);
     else if (e.key === 'ArrowRight') showWord(detail.i + 1);
