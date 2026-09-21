@@ -237,9 +237,9 @@
     z-index: 2;
     background: rgba(5, 9, 20, .6);
   }
-  .stamp.ok { top: 22px; right: 22px; color: var(--ok); transform: rotate(10deg); }
-  .stamp.no { top: 22px; left: 22px; color: var(--no); transform: rotate(-10deg); }
-  .stamp.warn { top: 22px; left: 50%; transform: translateX(-50%); color: var(--warn); }
+  .stamp.no { top: 22px; right: 22px; color: var(--no); transform: rotate(10deg); }
+  .stamp.warn { top: 22px; left: 22px; color: var(--warn); transform: rotate(-10deg); }
+  .stamp.ok { top: 22px; left: 50%; transform: translateX(-50%); color: var(--ok); text-shadow: 0 0 14px rgba(70, 224, 162, .8); }
   .stamp.later { bottom: 22px; left: 50%; transform: translateX(-50%); color: var(--ink-2); }
   .test-actions { display: flex; gap: 8px; margin-top: 4px; }
   .tbtn {
@@ -684,6 +684,65 @@
   .detail[data-stage="network"] .rate-row { display: flex; animation: fade .4s .7s both; }
   .detail[data-stage="network"] .ambient { opacity: .6; }
 
+  /* Test: 「覚えた」は上へ昇天していく（キラキラ） */
+  .tcard.ascend { transition: transform 1.05s cubic-bezier(.55, 0, .35, 1), opacity .95s ease-in; filter: drop-shadow(0 0 22px rgba(255, 236, 170, .85)) drop-shadow(0 0 6px rgba(70, 224, 162, .9)); }
+  .sparkles { position: absolute; inset: -60px 0 0; pointer-events: none; z-index: 3; }
+  .sparkles i {
+    position: absolute; left: var(--x); top: var(--y);
+    width: var(--s); height: var(--s);
+    background: var(--c);
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    opacity: 0;
+    animation: sparkle var(--t) var(--d) ease-out forwards;
+  }
+  @keyframes sparkle {
+    0% { opacity: 0; transform: translate(0, 0) scale(.2); }
+    25% { opacity: 1; transform: translate(calc(var(--dx) * .3), -70px) scale(1.15) rotate(40deg); }
+    100% { opacity: 0; transform: translate(var(--dx), -340px) scale(.3) rotate(120deg); }
+  }
+
+  /* ---------- TikTak: 縦フィード（TikTok オマージュ） ---------- */
+  .view.tiktak { padding: 0; overflow: hidden; background: #000; }
+  .tk-feed { position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .35s var(--pop); }
+  .tk-feed.dragging { transition: none; }
+  .tk-item { position: absolute; inset: 0; overflow: hidden; background: #000; transform: translateY(calc(var(--k) * 100%)); transition: transform .5s var(--ease); }
+  .tk-poster, .tk-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .tk-video { opacity: 0; transition: opacity .35s; }
+  .tk-video.on { opacity: 1; }
+  .tk-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, .55) 0%, rgba(0, 0, 0, 0) 28%, rgba(0, 0, 0, 0) 48%, rgba(0, 0, 0, .8) 100%); pointer-events: none; }
+  .tk-top { position: absolute; left: 0; right: 0; top: var(--top-inset); z-index: 4; display: flex; justify-content: center; align-items: center; gap: 22px; padding: 4px 16px; pointer-events: none; }
+  .tk-top .seg { pointer-events: auto; position: relative; background: none; border: 0; padding: 6px 2px; color: rgba(255, 255, 255, .62); font: inherit; font-size: 15px; font-weight: 700; letter-spacing: .02em; }
+  .tk-top .seg[aria-pressed="true"] { color: #fff; }
+  .tk-top .seg[aria-pressed="true"]::after { content: ""; position: absolute; left: 20%; right: 20%; bottom: 0; height: 2px; border-radius: 2px; background: #fff; }
+  .tk-count { position: absolute; right: 16px; color: rgba(255, 255, 255, .7); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .tk-hint { position: absolute; left: 50%; top: calc(var(--top-inset) + 48px); transform: translateX(-50%); z-index: 4; padding: 6px 12px; border-radius: 999px; background: rgba(0, 0, 0, .5); color: rgba(255, 255, 255, .85); font-size: 12px; white-space: nowrap; transition: opacity .5s; pointer-events: none; }
+  .tk-hint.off { opacity: 0; }
+  .tk-rail { position: absolute; right: 10px; bottom: 122px; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .tk-act { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0; color: #fff; font-size: 11px; font-weight: 600; text-shadow: 0 1px 6px rgba(0, 0, 0, .6); transition: transform .1s; }
+  .tk-act:active { transform: scale(.94); }
+  .tk-act .ring { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .38); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: box-shadow .2s, color .2s; }
+  .tk-act svg { width: 24px; height: 24px; }
+  .tk-act[aria-pressed="true"] .ring { color: var(--no); }
+  .tk-act[aria-pressed="true"] svg path { fill: currentColor; }
+  .tk-act.speaking .ring { box-shadow: 0 0 0 4px rgba(90, 200, 255, .35); }
+  .tk-caption { position: absolute; left: 16px; right: 84px; bottom: 30px; z-index: 4; color: #fff; text-shadow: 0 1px 8px rgba(0, 0, 0, .7); }
+  .tk-user { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; }
+  .tk-user .tk-freq { padding: 2px 8px; border: 1px solid rgba(255, 255, 255, .35); border-radius: 999px; color: rgba(255, 255, 255, .72); font-size: 11px; font-weight: 500; }
+  .tk-word { margin-top: 6px; font-size: 44px; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; }
+  .tk-ipa { margin-top: 2px; color: rgba(255, 255, 255, .75); font-size: 13px; }
+  .tk-meaning { margin-top: 10px; font-size: 18px; font-weight: 700; opacity: 0; transform: translateY(6px); transition: opacity .35s, transform .35s var(--ease); }
+  .tk-ex { margin: 6px 0 0; color: rgba(255, 255, 255, .82); font-size: 13px; line-height: 1.5; opacity: 0; transition: opacity .35s .1s; }
+  .tk-ex em { font-style: normal; font-weight: 700; color: var(--cyan); }
+  .tk-item.revealed .tk-meaning { opacity: 1; transform: none; }
+  .tk-item.revealed .tk-ex { opacity: 1; }
+  .tk-tags { margin-top: 8px; color: rgba(255, 255, 255, .7); font-size: 12px; }
+  .tk-pause { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .42); color: #fff; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .tk-pause svg { width: 36px; height: 36px; margin-left: 4px; }
+  .view.tiktak.paused .tk-pause { opacity: 1; }
+  .tk-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .18); z-index: 5; }
+  .tk-prog i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--violet)); }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
   @keyframes fade { from { opacity: 0; } }
   @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
   @keyframes slideIn { from { opacity: 0; transform: translateX(36px); } }
@@ -712,6 +771,7 @@
     <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-replay" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-test" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-tiktak" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9l4.5 3-4.5 3z" fill="currentColor"/></symbol>
     <symbol id="i-words" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-profile" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
   </defs>
@@ -746,7 +806,7 @@
         <section class="view" id="view-test" aria-labelledby="h-test">
           <header class="view-head">
             <h2 id="h-test">Test</h2>
-            <p class="sub">意味を思い出せた？ タップで答え、スワイプで仕分け</p>
+            <p class="sub">タップで答え。↑ 覚えた ／ → 全然 ／ ← もう少し ／ ↓ あとで</p>
           </header>
           <div class="tprog" aria-hidden="true"><i id="tprog-bar"></i></div>
           <div class="deck" id="deck">
@@ -789,6 +849,20 @@
             <button class="tbtn ok" type="button" data-rate="ok">覚えた</button>
           </div>
           <div class="test-foot"><span id="t-progress"></span><button class="link-btn" type="button" id="t-undo" hidden>1つ戻す</button></div>
+        </section>
+
+        <!-- TikTak: 3秒で次の単語へ流れる縦フィード -->
+        <section class="view tiktak" id="view-tiktak" aria-labelledby="h-tiktak">
+          <h2 id="h-tiktak" class="sr-only">TikTak</h2>
+          <div class="tk-top">
+            <button class="seg" type="button" data-order="random" aria-pressed="true">ランダム</button>
+            <button class="seg" type="button" data-order="freq" aria-pressed="false">頻出順</button>
+            <span class="tk-count" id="tk-count" aria-live="polite"></span>
+          </div>
+          <div class="tk-hint" id="tk-hint">3秒で次の単語へ。タップで一時停止、上下スワイプで移動</div>
+          <div class="tk-feed" id="tk-feed"></div>
+          <div class="tk-pause" aria-hidden="true"><svg><use href="#i-play"/></svg></div>
+          <div class="tk-prog" aria-hidden="true"><i id="tk-bar"></i></div>
         </section>
 
         <!-- Words -->
@@ -874,6 +948,7 @@
 
       <nav class="tabbar" aria-label="メイン">
         <button class="tab" type="button" data-tab="test"><span class="ic"><svg aria-hidden="true"><use href="#i-test"/></svg></span>Test</button>
+        <button class="tab" type="button" data-tab="tiktak"><span class="ic"><svg aria-hidden="true"><use href="#i-tiktak"/></svg></span>TikTak</button>
         <button class="tab" type="button" data-tab="words" aria-current="page"><span class="ic"><svg aria-hidden="true"><use href="#i-words"/></svg></span>Words</button>
         <button class="tab" type="button" data-tab="profile"><span class="ic"><svg aria-hidden="true"><use href="#i-profile"/></svg></span>Profile</button>
       </nav>
@@ -1136,6 +1211,7 @@
     $$('.tab').forEach(t => { if (t.dataset.tab === name) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current'); });
     if (name === 'profile') renderProfile();
     if (name === 'words') renderWords();
+    screen.dispatchEvent(new CustomEvent('tabchange', { detail: name }));
   };
   $$('.tab').forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
 
@@ -1258,7 +1334,7 @@
     test.flipped = false;
     const inner = $('.tcard-inner', tcard);
     inner.style.transition = 'none';
-    tcard.classList.remove('flipped', 'flying', 'settle');
+    tcard.classList.remove('flipped', 'flying', 'settle', 'ascend');
     void inner.offsetWidth;
     inner.style.transition = '';
     tcard.style.transform = ''; tcard.style.opacity = '';
@@ -1294,12 +1370,26 @@
     showCard();
     toast('1つ戻しました');
   };
+  const ascend = () => {
+    // 「覚えた」＝キラキラをまとって上へ昇天していく
+    const box = document.createElement('div'); box.className = 'sparkles'; box.setAttribute('aria-hidden', 'true');
+    const colors = ['#fff5c8', '#ffffff', '#46e0a2', '#ffe08a', '#a8fbe0'];
+    for (let i = 0; i < 24; i++) {
+      const sp = document.createElement('i');
+      sp.style.cssText = `--x:${6 + Math.random() * 88}%;--y:${80 + Math.random() * 300}px;--s:${6 + Math.random() * 12}px;--dx:${(Math.random() - .5) * 100}px;--t:${1000 + Math.random() * 700}ms;--d:${Math.random() * 260}ms;--c:${colors[i % colors.length]}`;
+      box.appendChild(sp);
+    }
+    deck.appendChild(box);
+    setTimeout(() => box.remove(), 2600);
+  };
   const flyOut = (dx, dy, label) => {
-    buzz(12);
+    const up = label === 'ok' && !RM;
+    buzz(up ? [12, 30, 18] : 12);
     tcard.classList.add('flying');
-    tcard.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * .06}deg)`;
+    if (up) { tcard.classList.add('ascend'); ascend(); }
+    tcard.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * .06}deg)${up ? ' scale(1.04)' : ''}`;
     tcard.style.opacity = '0';
-    setTimeout(() => rate(label), RM ? 0 : 320);
+    setTimeout(() => rate(label), RM ? 0 : up ? 860 : 320);
   };
   tcard.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
@@ -1314,9 +1404,9 @@
     tcard.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx * .05}deg)`;
     const k = v => Math.min(1, Math.max(0, (Math.abs(v) - 24) / 70));
     const horiz = Math.abs(dx) > Math.abs(dy);
-    $('.stamp.ok', tcard).style.opacity = horiz && dx > 0 ? k(dx) : 0;
-    $('.stamp.no', tcard).style.opacity = horiz && dx < 0 ? k(dx) : 0;
-    $('.stamp.warn', tcard).style.opacity = !horiz && dy < 0 ? k(dy) : 0;
+    $('.stamp.no', tcard).style.opacity = horiz && dx > 0 ? k(dx) : 0;
+    $('.stamp.warn', tcard).style.opacity = horiz && dx < 0 ? k(dx) : 0;
+    $('.stamp.ok', tcard).style.opacity = !horiz && dy < 0 ? k(dy) : 0;
     $('.stamp.later', tcard).style.opacity = !horiz && dy > 0 ? k(dy) : 0;
   });
   const endDrag = e => {
@@ -1324,9 +1414,10 @@
     const dx = e.clientX - test.drag.x, dy = e.clientY - test.drag.y;
     const moved = test.drag.moved; test.drag = null;
     const horiz = Math.abs(dx) > Math.abs(dy);
-    if (horiz && dx > 90) return flyOut(600, dy, 'ok');
-    if (horiz && dx < -90) return flyOut(-600, dy, 'no');
-    if (!horiz && dy < -90) return flyOut(dx, -700, 'warn');
+    // 仕様書（2026-09-21）: 右＝全然覚えてない／左＝もう少し／上＝覚えた（昇天）／下＝あとで
+    if (horiz && dx > 90) return flyOut(600, dy, 'no');
+    if (horiz && dx < -90) return flyOut(-600, dy, 'warn');
+    if (!horiz && dy < -90) return flyOut(dx, -700, 'ok');
     if (!horiz && dy > 90) return flyOut(dx, 700, 'later');
     tcard.classList.add('settle'); tcard.style.transform = '';
     $$('.stamp', tcard).forEach(s => s.style.opacity = 0);
@@ -1336,7 +1427,7 @@
   tcard.addEventListener('pointercancel', endDrag);
   $$('[data-rate]').forEach(b => b.addEventListener('click', () => {
     const l = b.dataset.rate;
-    flyOut(l === 'ok' ? 600 : l === 'no' ? -600 : 0, l === 'warn' ? -700 : 0, l);
+    flyOut(l === 'no' ? 600 : l === 'warn' ? -600 : 0, l === 'ok' ? -700 : 0, l);
   }));
   $('#t-again').addEventListener('click', startTest);
   $('#t-towords').addEventListener('click', () => showTab('words'));
@@ -1345,9 +1436,10 @@
   $('#t-more').addEventListener('click', () => { const id = test.queue[test.i]; if (id) openDetail(WORDS, WORDS.findIndex(w => w.id === id)); });
   document.addEventListener('keydown', e => {
     if (state.tab !== 'test' || !detailEl.hidden || deck.classList.contains('finished')) return;
-    if (e.key === 'ArrowRight') flyOut(600, 0, 'ok');
-    else if (e.key === 'ArrowLeft') flyOut(-600, 0, 'no');
-    else if (e.key === 'ArrowUp') { e.preventDefault(); flyOut(0, -700, 'warn'); }
+    if (e.key === 'ArrowRight') flyOut(600, 0, 'no');
+    else if (e.key === 'ArrowLeft') flyOut(-600, 0, 'warn');
+    else if (e.key === 'ArrowUp') { e.preventDefault(); flyOut(0, -700, 'ok'); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); flyOut(0, 700, 'later'); }
     else if (e.key === ' ') { e.preventDefault(); test.flipped = !test.flipped; tcard.classList.toggle('flipped', test.flipped); }
   });
   startTest();
@@ -1443,6 +1535,7 @@
     renderWords();
     if (state.tab === 'profile') renderProfile();
     if (binView.classList.contains('on')) renderBin();
+    screen.dispatchEvent(new CustomEvent('detailclosed'));
   };
 
   const setStage = s => {
@@ -1602,6 +1695,164 @@
     if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) showWord(detail.i + (dx < 0 ? 1 : -1));
   });
   detailEl.addEventListener('pointercancel', () => { sw = null; });
+
+  /* ---------- TikTak: 3秒で次の単語へ流れる縦フィード ---------- */
+  const TK_DWELL = 3000;   // 仕様書: 単語のイメージ動画が3秒流れ、3秒で下の単語に自動的に切り替わる
+  const TK_REVEAL = 1400;  // 意味が出るまでの間（思い出す時間）
+  const tkView = $('#view-tiktak');
+  const tkFeed = $('#tk-feed');
+  const tkBar = $('#tk-bar');
+  const tk = { list: [], i: 0, order: 'random', active: false, paused: false, t0: 0, elapsed: 0, raf: null, drag: null, hinted: false };
+  const tkItems = () => $$('.tk-item', tkFeed);
+  const tkCur = () => tkItems()[tk.i];
+  const tkBuild = () => {
+    tk.list = tk.order === 'freq' ? WORDS.slice().sort((a, b) => b.freq - a.freq) : shuffle(WORDS.slice());
+    tkFeed.innerHTML = tk.list.map(w => `
+      <article class="tk-item" data-id="${w.id}" style="--k:0">
+        <img class="tk-poster" src="${w.img}" alt="">
+        <video class="tk-video" muted playsinline loop preload="none"></video>
+        <div class="tk-shade" aria-hidden="true"></div>
+        <div class="tk-rail">
+          <button class="tk-act" type="button" data-act="speak" aria-label="発音を聞く"><span class="ring"><svg aria-hidden="true"><use href="#i-speaker"/></svg></span>発音</button>
+          <button class="tk-act" type="button" data-act="fav" aria-pressed="${!!state.fav[w.id]}" aria-label="お気に入り"><span class="ring"><svg aria-hidden="true"><use href="#i-heart"/></svg></span>保存</button>
+          <button class="tk-act" type="button" data-act="detail" aria-label="単語ページで見る"><span class="ring"><svg aria-hidden="true"><use href="#i-words"/></svg></span>詳しく</button>
+        </div>
+        <div class="tk-caption">
+          <div class="tk-user">@sarutan<span class="tk-freq">動画 ${w.freq}回</span></div>
+          <div class="tk-word">${esc(w.word)}</div>
+          <div class="tk-ipa">${esc(w.ipa)}</div>
+          <div class="tk-meaning">${esc(w.meaning)}</div>
+          <p class="tk-ex">${exHtml(w.ex.en)}</p>
+          <div class="tk-tags">${w.meaning.split(/[・、,]/).map(m => '#' + esc(m.trim())).join(' ')} #${esc(w.net[0][0])}</div>
+        </div>
+      </article>`).join('');
+    tk.i = 0;
+    tkLayout();
+  };
+  const tkLayout = () => {
+    tkItems().forEach((el, k) => { el.style.setProperty('--k', k - tk.i); el.classList.toggle('cur', k === tk.i); });
+    $('#tk-count').textContent = `${tk.i + 1} / ${tk.list.length}`;
+  };
+  const tkVideo = (el, w) => {
+    const v = $('.tk-video', el);
+    if (!w.vid || w.vidFailed) return null;
+    if (!v.src) {
+      try { if (!vidCache[w.id]) vidCache[w.id] = URL.createObjectURL(b64toBlob(w.vid)); v.src = vidCache[w.id]; }
+      catch (e) { v.src = w.vid; }
+      v.addEventListener('playing', () => v.classList.add('on'));
+      v.addEventListener('error', () => { v.classList.remove('on'); v.removeAttribute('src'); }, { once: true });
+    }
+    return v;
+  };
+  const tkShow = () => {
+    const w = tk.list[tk.i];
+    const el = tkCur();
+    if (!w || !el) return;
+    tkItems().forEach(x => { if (x !== el) { $('.tk-video', x).pause(); $('.tk-video', x).classList.remove('on'); x.classList.remove('revealed'); } });
+    el.classList.remove('revealed');
+    tkLayout();
+    const v = tkVideo(el, w);
+    if (v) { try { v.currentTime = 0; } catch (e) { /* not loaded yet */ } if (!tk.paused) v.play().catch(() => {}); }
+    const nel = tkItems()[tk.i + 1];
+    if (nel) tkVideo(nel, tk.list[tk.i + 1]);   // 次の動画を先に読んでおく
+    tk.t0 = performance.now(); tk.elapsed = 0;
+    tkBar.style.width = '0%';
+  };
+  const tkGo = i => {
+    const n = tk.list.length;
+    if (!n) return;
+    if (i >= n && tk.order === 'random') tkBuild();      // 一周したら混ぜ直す
+    else tk.i = (i + n) % n;
+    tkShow();
+  };
+  const tkTick = now => {
+    tk.raf = null;
+    if (!tk.active || tk.paused) return;
+    const elapsed = tk.elapsed + (now - tk.t0);
+    tkBar.style.width = Math.min(100, elapsed / TK_DWELL * 100) + '%';
+    if (elapsed >= TK_REVEAL) { const el = tkCur(); if (el) el.classList.add('revealed'); }
+    if (elapsed >= TK_DWELL) tkGo(tk.i + 1);
+    tk.raf = requestAnimationFrame(tkTick);
+  };
+  const tkRun = () => { if (!tk.raf) tk.raf = requestAnimationFrame(tkTick); };
+  const tkPause = p => {
+    if (tk.paused === p) return;
+    tk.paused = p;
+    tkView.classList.toggle('paused', p);
+    const el = tkCur(); const v = el && $('.tk-video', el);
+    if (p) { tk.elapsed += performance.now() - tk.t0; if (v) v.pause(); }
+    else { tk.t0 = performance.now(); if (v && v.src) v.play().catch(() => {}); tkRun(); }
+  };
+  const tkStart = () => {
+    if (tk.active) return;
+    tk.active = true;
+    if (!tk.list.length) tkBuild();
+    tk.paused = false; tkView.classList.remove('paused');
+    tkShow(); tkRun();
+    if (!tk.hinted) { tk.hinted = true; setTimeout(() => $('#tk-hint').classList.add('off'), 3800); }
+  };
+  const tkStop = () => {
+    if (!tk.active) return;
+    tk.active = false;
+    if (tk.raf) { cancelAnimationFrame(tk.raf); tk.raf = null; }
+    tkItems().forEach(x => $('.tk-video', x).pause());
+  };
+  screen.addEventListener('tabchange', e => { if (e.detail === 'tiktak') tkStart(); else tkStop(); });
+  screen.addEventListener('detailclosed', () => {
+    if (state.tab !== 'tiktak') return;
+    tkItems().forEach((el, k) => $('[data-act="fav"]', el).setAttribute('aria-pressed', String(!!state.fav[tk.list[k].id])));
+    tkStart();
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (state.tab !== 'tiktak' || !detailEl.hidden) return;
+    if (document.hidden) tkStop(); else tkStart();
+  });
+  tkFeed.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    tk.drag = { y: e.clientY, moved: false };
+    tkFeed.classList.add('dragging');
+    try { tkFeed.setPointerCapture(e.pointerId); } catch (err) { /* synthetic pointer */ }
+  });
+  tkFeed.addEventListener('pointermove', e => {
+    if (!tk.drag) return;
+    const dy = e.clientY - tk.drag.y;
+    if (Math.abs(dy) > 8) tk.drag.moved = true;
+    tkFeed.style.transform = `translateY(${dy * .6}px)`;
+  });
+  const tkEnd = e => {
+    if (!tk.drag) return;
+    const dy = e.clientY - tk.drag.y; const moved = tk.drag.moved; tk.drag = null;
+    tkFeed.classList.remove('dragging'); tkFeed.style.transform = '';
+    if (dy < -60) { buzz(8); tkGo(tk.i + 1); return; }   // 上スワイプ＝次の単語
+    if (dy > 60) { buzz(8); tkGo(tk.i - 1); return; }    // 下スワイプ＝前の単語
+    if (!moved) tkPause(!tk.paused);                     // タップ＝一時停止／再開
+  };
+  tkFeed.addEventListener('pointerup', tkEnd);
+  tkFeed.addEventListener('pointercancel', () => { tk.drag = null; tkFeed.classList.remove('dragging'); tkFeed.style.transform = ''; });
+  tkFeed.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]'); if (!b) return;
+    e.stopPropagation();
+    const w = tk.list[tk.i]; if (!w) return;
+    if (b.dataset.act === 'speak') speakWord(w.word, b);
+    if (b.dataset.act === 'fav') {
+      if (state.fav[w.id]) delete state.fav[w.id]; else state.fav[w.id] = true;
+      save(); b.setAttribute('aria-pressed', String(!!state.fav[w.id]));
+      toast(state.fav[w.id] ? 'お気に入りに保存しました' : 'お気に入りから外しました');
+    }
+    if (b.dataset.act === 'detail') { tkStop(); openDetail(tk.list, tk.i); }
+  });
+  $$('.tk-top .seg').forEach(b => b.addEventListener('click', () => {
+    if (tk.order === b.dataset.order) return;
+    tk.order = b.dataset.order;
+    $$('.tk-top .seg').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    tkBuild(); tk.paused = false; tkView.classList.remove('paused'); tkShow(); tkRun();
+  }));
+  document.addEventListener('keydown', e => {
+    if (state.tab !== 'tiktak' || !detailEl.hidden) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); tkGo(tk.i + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); tkGo(tk.i - 1); }
+    else if (e.key === ' ') { e.preventDefault(); tkPause(!tk.paused); }
+  });
 
   renderWords();
   renderProfile();
