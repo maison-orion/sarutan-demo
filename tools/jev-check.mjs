@@ -53,6 +53,7 @@ const html = readFileSync(TEMPLATE, "utf8");
 const spec = JSON.parse(readFileSync(SPEC, "utf8"));
 const parts = {
   "Test ページの CSS（スタンプの位置と昇天の演出）": html.split("\n").filter((l) => /\.stamp\.|\.tcard\.ascend|\.sparkles|@keyframes sparkle/.test(l)).join("\n"),
+  "TikTak ページの CSS（確認モード）": html.split("\n").filter((l) => /\.tk-act\.rate|\.tk-check|\.tk-stamp|\.view\.tiktak\.check/.test(l)).join("\n"),
   "タブバーの HTML": slice(html, '<nav class="tabbar"', "</nav>", "tabbar"),
   "TikTak ページの HTML": slice(html, "<!-- TikTak", "<!-- Words -->", "tiktak html"),
   "Test ページの JS": slice(html, "/* ---------- Test (swipe) ---------- */", "/* ---------- Word detail", "test js"),
@@ -83,6 +84,10 @@ const Q = {
   tk_5s:       { ask: "TikTak ページでは、表示から 5000 ミリ秒（5秒）経つと自動的に次の単語へ切り替わる。", expect: false, spec: 42 },
   tk_next_down:{ ask: "TikTak ページで自動的に切り替わる先は、リスト上で次（下）の単語（tk.i + 1）である。", expect: true, spec: 42 },
   tk_swipe:    { ask: "TikTak ページでは、上へスワイプすると次の単語、下へスワイプすると前の単語へ手動でも移れる。", expect: true, spec: 39 },
+  tk_check_toggle: { ask: "TikTak ページには「確認モード」の切り替えボタン（id=\"tk-check\"）があり、押すと view に class 'check' が付いたり外れたりする。", expect: true, spec: 24 },
+  tk_check_rate:   { ask: "確認モードで「覚えた」または「全然」のボタン（data-act=\"rate\"）を押すと、その単語の判定が state.ratings（My単語帳）に保存され、スタンプを見せてから次の単語へ進む。", expect: true, spec: 24 },
+  tk_check_hidden: { ask: "TikTak ページの CSS で、「覚えた」「全然」のボタン（.tk-act.rate）は確認モードが OFF のとき表示されない（display: none）。", expect: true, spec: 24 },
+  tk_check_always: { ask: "「覚えた」「全然」のボタン（.tk-act.rate）は確認モードの ON／OFF に関わらず常に表示される。", expect: false, spec: 24 },
   tk_pause:    { ask: "TikTak ページでは、画面をタップすると自動切り替えと動画が一時停止し、もう一度タップすると再開する。", expect: true, spec: 39 },
 };
 const questions = Object.fromEntries(Object.entries(Q).map(([k, q]) => [k, { type: "noul", instructions: q.ask }]));

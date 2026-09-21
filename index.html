@@ -739,6 +739,19 @@
   .tk-pause { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .42); color: #fff; opacity: 0; transition: opacity .2s; pointer-events: none; }
   .tk-pause svg { width: 36px; height: 36px; margin-left: 4px; }
   .view.tiktak.paused .tk-pause { opacity: 1; }
+  /* TikTak 確認モード: 流れる単語に 覚えた／全然 をタップ → My単語帳 */
+  .tk-check { position: absolute; left: 14px; top: calc(var(--top-inset) + 6px); z-index: 5; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .35); background: rgba(0, 0, 0, .42); color: rgba(255, 255, 255, .85); font: inherit; font-size: 11px; font-weight: 600; white-space: nowrap; transition: background .2s, color .2s; }
+  .tk-check[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: #071022; }
+  .tk-check .tally { margin-left: 4px; font-variant-numeric: tabular-nums; }
+  .tk-act.rate { display: none; }
+  .view.tiktak.check .tk-act.rate { display: flex; }
+  .view.tiktak.check .tk-rail { gap: 10px; }
+  .tk-act.rate.ok .ring { color: var(--ok); border-color: rgba(70, 224, 162, .55); }
+  .tk-act.rate.no .ring { color: var(--no); border-color: rgba(255, 107, 139, .55); }
+  .tk-stamp { position: absolute; left: 50%; top: 40%; z-index: 6; transform: translate(-50%, -50%) rotate(-8deg) scale(.6); padding: 8px 18px; border: 3px solid; border-radius: 10px; background: rgba(0, 0, 0, .45); font-size: 28px; font-weight: 800; letter-spacing: .04em; opacity: 0; pointer-events: none; transition: opacity .2s, transform .28s var(--pop); }
+  .tk-stamp.ok { color: var(--ok); }
+  .tk-stamp.no { color: var(--no); }
+  .tk-item.stamped .tk-stamp { opacity: 1; transform: translate(-50%, -50%) rotate(-8deg) scale(1); }
   .tk-prog { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: rgba(255, 255, 255, .18); z-index: 5; }
   .tk-prog i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--violet)); }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -785,7 +798,7 @@
     <ol>
       <li><b>Words</b> → 単語をタップ → 動画をタップ。10秒のシーケンスが走ります</li>
       <li><b>Test</b> → カードをタップで意味、上＝覚えた／右＝全然／左＝もう少し／下＝あとで</li>
-      <li><b>TikTak</b> → 3秒で次の単語へ流れる縦フィード（タップで一時停止）</li>
+      <li><b>TikTak</b> → 3秒で次の単語へ流れる縦フィード。確認モードで「覚えた／全然」を仕分け</li>
       <li><b>Profile</b> → My単語帳と「解説の方言」の切り替え</li>
     </ol>
     <p class="note-foot">スマホで開くと全画面のアプリになります。</p>
@@ -860,6 +873,7 @@
             <button class="seg" type="button" data-order="freq" aria-pressed="false">頻出順</button>
             <span class="tk-count" id="tk-count" aria-live="polite"></span>
           </div>
+          <button class="tk-check" type="button" id="tk-check" aria-pressed="false">確認モード<span class="tally" id="tk-tally"></span></button>
           <div class="tk-hint" id="tk-hint">3秒で次の単語へ。タップで一時停止、上下スワイプで移動</div>
           <div class="tk-feed" id="tk-feed"></div>
           <div class="tk-pause" aria-hidden="true"><svg><use href="#i-play"/></svg></div>
@@ -923,7 +937,7 @@
             </div>
           </div>
           <p class="dialect-note" id="dialect-sample"></p>
-          <p class="version">さる単 デモ v0.4</p>
+          <p class="version">さる単 デモ v0.4.1</p>
         </section>
 
         <!-- My単語帳: label page (same template as Words; title = label name) -->
@@ -1703,7 +1717,7 @@
   const tkView = $('#view-tiktak');
   const tkFeed = $('#tk-feed');
   const tkBar = $('#tk-bar');
-  const tk = { list: [], i: 0, order: 'random', active: false, paused: false, t0: 0, elapsed: 0, raf: null, drag: null, hinted: false };
+  const tk = { list: [], i: 0, order: 'random', check: false, tally: { ok: 0, no: 0 }, active: false, paused: false, t0: 0, elapsed: 0, raf: null, drag: null, hinted: false };
   const tkItems = () => $$('.tk-item', tkFeed);
   const tkCur = () => tkItems()[tk.i];
   const tkBuild = () => {
@@ -1713,7 +1727,10 @@
         <img class="tk-poster" src="${w.img}" alt="">
         <video class="tk-video" muted playsinline loop preload="none"></video>
         <div class="tk-shade" aria-hidden="true"></div>
+        <div class="tk-stamp" aria-hidden="true"></div>
         <div class="tk-rail">
+          <button class="tk-act rate ok" type="button" data-act="rate" data-rate="ok" aria-label="覚えた"><span class="ring">${icon('check')}</span>覚えた</button>
+          <button class="tk-act rate no" type="button" data-act="rate" data-rate="no" aria-label="全然覚えてない"><span class="ring"><svg aria-hidden="true"><use href="#i-close"/></svg></span>全然</button>
           <button class="tk-act" type="button" data-act="speak" aria-label="発音を聞く"><span class="ring"><svg aria-hidden="true"><use href="#i-speaker"/></svg></span>発音</button>
           <button class="tk-act" type="button" data-act="fav" aria-pressed="${!!state.fav[w.id]}" aria-label="お気に入り"><span class="ring"><svg aria-hidden="true"><use href="#i-heart"/></svg></span>保存</button>
           <button class="tk-act" type="button" data-act="detail" aria-label="単語ページで見る"><span class="ring"><svg aria-hidden="true"><use href="#i-words"/></svg></span>詳しく</button>
@@ -1749,7 +1766,7 @@
     const w = tk.list[tk.i];
     const el = tkCur();
     if (!w || !el) return;
-    tkItems().forEach(x => { if (x !== el) { $('.tk-video', x).pause(); $('.tk-video', x).classList.remove('on'); x.classList.remove('revealed'); } });
+    tkItems().forEach(x => { if (x !== el) { $('.tk-video', x).pause(); $('.tk-video', x).classList.remove('on'); x.classList.remove('revealed', 'stamped'); } });
     el.classList.remove('revealed');
     tkLayout();
     const v = tkVideo(el, w);
@@ -1840,7 +1857,23 @@
       save(); b.setAttribute('aria-pressed', String(!!state.fav[w.id]));
       toast(state.fav[w.id] ? 'お気に入りに保存しました' : 'お気に入りから外しました');
     }
+    if (b.dataset.act === 'rate') {
+      // 確認モード: 判定を My単語帳（state.ratings）に入れて、スタンプを見せてから次へ
+      const r = b.dataset.rate; const at = tk.i; const el = tkCur();
+      state.ratings[w.id] = r; save(); tk.tally[r]++;
+      $('#tk-tally').textContent = ` ✓${tk.tally.ok} ✗${tk.tally.no}`;
+      const st = $('.tk-stamp', el); st.textContent = r === 'ok' ? '覚えた' : '全然'; st.className = 'tk-stamp ' + r; el.classList.add('stamped');
+      buzz(r === 'ok' ? [12, 30, 18] : 12);
+      setTimeout(() => { el.classList.remove('stamped'); if (tk.active && tk.i === at) tkGo(at + 1); }, RM ? 0 : 450);
+    }
     if (b.dataset.act === 'detail') { tkStop(); openDetail(tk.list, tk.i); }
+  });
+  $('#tk-check').addEventListener('click', e => {
+    tk.check = !tk.check;
+    e.currentTarget.setAttribute('aria-pressed', String(tk.check));
+    tkView.classList.toggle('check', tk.check);
+    buzz(8);
+    if (tk.check) toast('確認モード: 覚えた／全然 をタップすると My単語帳に入ります');
   });
   $$('.tk-top .seg').forEach(b => b.addEventListener('click', () => {
     if (tk.order === b.dataset.order) return;
