@@ -742,7 +742,6 @@
   /* TikTak 確認モード: 流れる単語に 覚えた／全然 をタップ → My単語帳 */
   .tk-check { position: absolute; left: 14px; top: calc(var(--top-inset) + 6px); z-index: 5; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .35); background: rgba(0, 0, 0, .42); color: rgba(255, 255, 255, .85); font: inherit; font-size: 11px; font-weight: 600; white-space: nowrap; transition: background .2s, color .2s; }
   .tk-check[aria-pressed="true"] { background: var(--ok); border-color: var(--ok); color: #071022; }
-  .tk-check .tally { margin-left: 4px; font-variant-numeric: tabular-nums; }
   .tk-act.rate { display: none; }
   .view.tiktak.check .tk-act.rate { display: flex; }
   .view.tiktak.check .tk-rail { gap: 10px; }
@@ -873,7 +872,7 @@
             <button class="seg" type="button" data-order="freq" aria-pressed="false">頻出順</button>
             <span class="tk-count" id="tk-count" aria-live="polite"></span>
           </div>
-          <button class="tk-check" type="button" id="tk-check" aria-pressed="false">確認モード<span class="tally" id="tk-tally"></span></button>
+          <button class="tk-check" type="button" id="tk-check" aria-pressed="false">確認モード</button>
           <div class="tk-hint" id="tk-hint">3秒で次の単語へ。タップで一時停止、上下スワイプで移動</div>
           <div class="tk-feed" id="tk-feed"></div>
           <div class="tk-pause" aria-hidden="true"><svg><use href="#i-play"/></svg></div>
@@ -1749,7 +1748,7 @@
   };
   const tkLayout = () => {
     tkItems().forEach((el, k) => { el.style.setProperty('--k', k - tk.i); el.classList.toggle('cur', k === tk.i); });
-    $('#tk-count').textContent = `${tk.i + 1} / ${tk.list.length}`;
+    $('#tk-count').textContent = `${tk.i + 1} / ${tk.list.length}` + (tk.check ? ` ・ ✓${tk.tally.ok} ✗${tk.tally.no}` : '');
   };
   const tkVideo = (el, w) => {
     const v = $('.tk-video', el);
@@ -1861,7 +1860,7 @@
       // 確認モード: 判定を My単語帳（state.ratings）に入れて、スタンプを見せてから次へ
       const r = b.dataset.rate; const at = tk.i; const el = tkCur();
       state.ratings[w.id] = r; save(); tk.tally[r]++;
-      $('#tk-tally').textContent = ` ✓${tk.tally.ok} ✗${tk.tally.no}`;
+      tkLayout();
       const st = $('.tk-stamp', el); st.textContent = r === 'ok' ? '覚えた' : '全然'; st.className = 'tk-stamp ' + r; el.classList.add('stamped');
       buzz(r === 'ok' ? [12, 30, 18] : 12);
       setTimeout(() => { el.classList.remove('stamped'); if (tk.active && tk.i === at) tkGo(at + 1); }, RM ? 0 : 450);
@@ -1872,6 +1871,7 @@
     tk.check = !tk.check;
     e.currentTarget.setAttribute('aria-pressed', String(tk.check));
     tkView.classList.toggle('check', tk.check);
+    tkLayout();
     buzz(8);
     if (tk.check) toast('確認モード: 覚えた／全然 をタップすると My単語帳に入ります');
   });
