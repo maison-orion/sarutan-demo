@@ -392,12 +392,13 @@
   .corner.tr { top: 0; right: 0; --c: var(--c-syn); background: rgba(95, 211, 154, .16); border-bottom-left-radius: 100%; align-items: flex-start; justify-content: flex-end; padding: calc(var(--top-inset) - 8px) 10px 0 0; transform-origin: top right; }
   .corner.bl { bottom: 0; left: 0; --c: var(--c-core); background: rgba(255, 200, 87, .15); border-top-right-radius: 100%; align-items: flex-end; justify-content: flex-start; padding: 0 0 calc(var(--bottom-inset) + 20px) 10px; transform-origin: bottom left; }
   .corner.br { bottom: 0; right: 0; --c: var(--c-kai); background: rgba(178, 140, 255, .17); border-top-left-radius: 100%; align-items: flex-end; justify-content: flex-end; padding: 0 10px calc(var(--bottom-inset) + 20px) 0; transform-origin: bottom right; }
+  @media (max-height: 700px) { .corner { width: 126px; height: 126px; } .corner .c-in { width: 80px; } }
   .corner:active, .corner.peek { transform: scale(1.12); filter: brightness(1.35); }
   .d-top { position: absolute; left: 50%; top: calc(var(--top-inset) - 4px); transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .d-count { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-  .d-center { position: absolute; left: 20px; right: 20px; top: calc(var(--top-inset) + 90px); bottom: 150px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; transition: transform .35s var(--pop); }
+  .d-center { position: absolute; left: 20px; right: 20px; top: max(calc(var(--top-inset) + 90px), 128px); bottom: 150px; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; transition: transform .35s var(--pop); }
   .d-center.panning { transition: none; }
-  .d-clip { position: relative; flex: none; width: clamp(160px, calc((100dvh - 470px) * 1.78), 300px); max-width: 100%; aspect-ratio: 16 / 9; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2); box-shadow: 0 16px 40px rgba(0, 0, 0, .5); }
+  .d-clip { position: relative; flex: none; width: clamp(150px, calc((100dvh - 520px) * 1.78), 300px); max-width: 100%; aspect-ratio: 16 / 9; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2); box-shadow: 0 16px 40px rgba(0, 0, 0, .5); }
   .d-clip img, .d-clip video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .d-clip video { opacity: 0; transition: opacity .35s; }
   .d-clip video.on { opacity: 1; }
