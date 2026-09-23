@@ -384,7 +384,7 @@
   .version { margin: 30px 0 0; text-align: center; font-size: 11px; color: var(--ink-3); }
 
   /* ---------- 単語ページ: 中央＋四隅（仕様書 2026-09-23） ---------- */
-  .detail { position: absolute; inset: 0; z-index: 20; overflow: hidden; touch-action: none; background: radial-gradient(120% 70% at 50% 42%, #0f1d4a 0%, var(--bg) 72%); animation: rise .38s var(--ease); }
+  .detail { position: absolute; inset: 0; z-index: 20; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(120% 70% at 50% 42%, #0f1d4a 0%, var(--bg) 72%); animation: rise .38s var(--ease); }
   .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-soft); background: rgba(16, 28, 72, .45); display: grid; place-items: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .1s, color .2s; }
   .icon-btn svg { width: 18px; height: 18px; }
   .corner { position: absolute; z-index: 3; width: 142px; height: 142px; padding: 0; border: 0; color: var(--c); display: flex; transition: transform .2s var(--pop), filter .2s; }
@@ -793,7 +793,7 @@
           <p class="d-ex" id="d-ex"></p>
           <p class="d-exja" id="d-exja"></p>
         </div>
-        <p class="d-hint">四隅をタップ ／ 2本指でスワイプ</p>
+        <p class="d-hint">四隅をタップ ／ 斜めに引っぱると角が開く</p>
         <button class="monkey" type="button" data-act="tips" aria-label="おさるさんの覚え方"><svg aria-hidden="true"><use href="#i-monkey"/></svg>Tips</button>
         <button class="arrow prev" type="button" data-act="prev" aria-label="前の単語"><svg><use href="#i-left"/></svg></button>
         <button class="arrow next" type="button" data-act="next" aria-label="次の単語"><svg><use href="#i-right"/></svg></button>
@@ -1277,7 +1277,7 @@
   const centerEl = $('#d-center');
   const sheetEl = $('#sheet');
   const sphereEl = $('#sphere');
-  const detail = { list: [], i: 0, word: null, pts: new Map(), pan: null, sw: null, wheel: { x: 0, y: 0, t: 0, fired: 0 } };
+  const detail = { list: [], i: 0, word: null, drag: null, dragEnd: 0 };
 
   // video: decode the embedded clip into a blob URL once per word; fall back to the still if anything fails
   const vidCache = {};
@@ -1411,52 +1411,42 @@
     else if (e.key === 'ArrowRight') showWord(detail.i + 1);
   });
 
-  // 1本指の左右スワイプ＝前後の単語。2本指＝Google Maps のように引っぱると、反対側の角（隠れていた面）が開く
+  // 1本指で引っぱる（仕様書 9/23 追記: 2本指ではなく1本指）。Google Maps のように、斜めに引くと反対側の角（隠れていた面）が開く。
+  // ほぼ真横に払ったときは前後の単語へ。引いている間は開く予定の角を光らせる。タップで開くのは今までどおり
   const cornerFor = (dx, dy) => (dy > 0 ? 't' : 'b') + (dx > 0 ? 'l' : 'r');
+  const swipeKind = (dx, dy) => {
+    const ax = Math.abs(dx); const ay = Math.abs(dy);
+    if (Math.hypot(dx, dy) < 60) return null;
+    if (Math.min(ax, ay) / Math.max(ax, ay) >= .45) return 'corner';   // 縦横どちらにも動いた＝斜め
+    return ax > ay ? 'word' : null;
+  };
   const peek = k => $$('.corner', detailEl).forEach(c => c.classList.toggle('peek', c.dataset.corner === k));
-  const mid = () => { const ps = [...detail.pts.values()]; return { x: (ps[0].x + ps[1].x) / 2, y: (ps[0].y + ps[1].y) / 2 }; };
   detailEl.addEventListener('pointerdown', e => {
-    detail.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (detail.pts.size === 2) { const m = mid(); detail.pan = { x: m.x, y: m.y, dx: 0, dy: 0 }; detail.sw = null; centerEl.classList.add('panning'); }
-    else if (detail.pts.size === 1 && !e.target.closest('button')) detail.sw = { x: e.clientX, y: e.clientY };
+    if (detail.drag) return;   // 2本目以降の指は使わない
+    detail.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
   });
   detailEl.addEventListener('pointermove', e => {
-    if (!detail.pts.has(e.pointerId)) return;
-    detail.pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (!detail.pan || detail.pts.size < 2) return;
-    const m = mid(); const dx = m.x - detail.pan.x; const dy = m.y - detail.pan.y;
-    detail.pan.dx = dx; detail.pan.dy = dy;
+    const d = detail.drag; if (!d || d.id !== e.pointerId) return;
+    const dx = e.clientX - d.x; const dy = e.clientY - d.y;
+    if (!d.moved && Math.hypot(dx, dy) < 10) return;
+    d.moved = true;
+    centerEl.classList.add('panning');
     centerEl.style.transform = `translate(${dx * .45}px, ${dy * .45}px)`;
-    peek(Math.hypot(dx, dy) > 40 ? cornerFor(dx, dy) : null);
+    peek(swipeKind(dx, dy) === 'corner' ? cornerFor(dx, dy) : null);
   });
   const endPtr = e => {
-    detail.pts.delete(e.pointerId);
-    if (detail.pan) {
-      if (detail.pts.size) return;
-      const { dx, dy } = detail.pan; detail.pan = null;
-      centerEl.classList.remove('panning'); centerEl.style.transform = ''; peek(null);
-      if (Math.hypot(dx, dy) > 60 && Math.min(Math.abs(dx), Math.abs(dy)) > 10) openCorner(cornerFor(dx, dy));
-      return;
-    }
-    if (detail.sw && e.type === 'pointerup') {
-      const dx = e.clientX - detail.sw.x; const dy = e.clientY - detail.sw.y;
-      if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) showWord(detail.i + (dx < 0 ? 1 : -1));
-    }
-    detail.sw = null;
+    const d = detail.drag; if (!d || d.id !== e.pointerId) return;
+    detail.drag = null;
+    centerEl.classList.remove('panning'); centerEl.style.transform = ''; peek(null);
+    if (!d.moved || e.type !== 'pointerup') return;
+    detail.dragEnd = performance.now();   // 引っぱった直後の click で、指の下のボタン（動画など）が反応しないようにする
+    const dx = e.clientX - d.x; const dy = e.clientY - d.y; const k = swipeKind(dx, dy);
+    if (k === 'corner') openCorner(cornerFor(dx, dy));
+    else if (k === 'word') showWord(detail.i + (dx < 0 ? 1 : -1));
   };
   detailEl.addEventListener('pointerup', endPtr);
   detailEl.addEventListener('pointercancel', endPtr);
-  // パソコンのトラックパッド（2本指スクロール）でも同じ向きで角を開く
-  detailEl.addEventListener('wheel', e => {
-    if (!sheetEl.hidden || !sphereEl.hidden) return;
-    e.preventDefault();
-    const now = performance.now(); const wh = detail.wheel;
-    if (now - wh.t > 300) { wh.x = 0; wh.y = 0; }
-    wh.t = now; wh.x += e.deltaX; wh.y += e.deltaY;
-    if (Math.hypot(wh.x, wh.y) > 160 && Math.min(Math.abs(wh.x), Math.abs(wh.y)) > 30 && now - wh.fired > 900) {
-      wh.fired = now; const k = (wh.y < 0 ? 't' : 'b') + (wh.x < 0 ? 'l' : 'r'); wh.x = 0; wh.y = 0; openCorner(k);
-    }
-  }, { passive: false });
+  detailEl.addEventListener('click', e => { if (performance.now() - detail.dragEnd < 400) { e.stopPropagation(); e.preventDefault(); } }, true);
 
   /* ---------- TikTak: 5秒で次の単語へ流れる縦フィード ---------- */
   const TK_DWELL = 5000;   // 仕様書（9/23）: 5秒で下の単語に自動的に切り替わる

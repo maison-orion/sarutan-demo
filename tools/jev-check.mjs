@@ -102,7 +102,8 @@ const GROUPS = [
       wp_br: ["単語ページの右下の角（data-corner=\"br\"）は「解説」で、押すと解説（kaisetsu）がポップアップで出る。", true, 69],
       wp_swap: ["単語ページの左上の角は「類義語」、右上の角は「品詞の違い」である。", false, 67],
       wp_monkey: ["単語ページのサルのアイコン（#i-monkey）のボタン（data-act=\"tips\"）を押すと openSheet('tips', …) が呼ばれ、「おさるさんの覚え方」のシートに w.tips[state.dialect]（方言設定に合わせた覚え方）が表示される。", true, 71],
-      wp_twofinger: ["単語ページでは、2本の指が同時に触れている（detail.pts.size が 2）ときに指を動かして離すと、動いた向き（dx, dy）から cornerFor で四隅の1つを決め、openCorner でその角のポップアップか別ページを開く。", true, 64],
+      wp_onefinger: ["単語ページでは、1本の指で斜め（縦にも横にも動いた向き）に引っぱって離すと、動いた向き（dx, dy）から cornerFor で四隅の1つを決め、openCorner でその角のポップアップか別ページを開く。四隅のボタンをタップして開く動きも残っている。", true, 0],
+      wp_twofinger_only: ["単語ページで四隅が開くのは、2本の指が同時に触れているときだけである。", false, 0],
       wp_onefinger_corner: ["単語ページでは、1本指で左右にスワイプすると四隅のどれかが開く。", false, 64],
     },
   },
@@ -160,7 +161,7 @@ const run = async () => {
       const pass = typeof v === "number" && (v > THRESHOLD) === q[1];
       total++; if (!pass) fails++;
       if (g.facts) { if (!pass || argv.includes("--all")) console.log(`| ${pass ? "✅" : "⚠️"} | ${k} | ${q[2]} | ${typeof v === "number" ? v.toFixed(3) : "—"} | ${q[0]} |`); }
-      else console.log(`| ${pass ? "✅" : "❌"} | ${k} | ${q[2] || "9/22メモ"} | ${q[1]} | ${typeof v === "number" ? v.toFixed(3) : "—"} |`);
+      else console.log(`| ${pass ? "✅" : "❌"} | ${k} | ${q[2] || "9/22メモ・9/23追記"} | ${q[1]} | ${typeof v === "number" ? v.toFixed(3) : "—"} |`);
     }
   }
   console.log(`\n${total - fails}/${total} 一致 ／ 入力 ${tokens.toLocaleString()} トークン ／ $${((tokens / 1e6) * USD_PER_MTOK).toFixed(5)}`);
