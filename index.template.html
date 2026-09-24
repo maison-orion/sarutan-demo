@@ -418,11 +418,10 @@
   .monkey { position: absolute; left: 50%; bottom: calc(var(--bottom-inset) + 18px); transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 0; background: none; border: 0; color: var(--c-tips); font-size: 11px; font-weight: 700; }
   .monkey svg { width: 52px; height: 52px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); animation: float 3.6s ease-in-out infinite; }
   .d-hint { position: absolute; left: 0; right: 0; bottom: calc(var(--bottom-inset) + 104px); margin: 0; text-align: center; font-size: 11px; color: var(--ink-3); pointer-events: none; }
-  .arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line-soft); background: rgba(16, 28, 72, .5); display: none; place-items: center; color: var(--ink-2); }
-  .arrow svg { width: 16px; height: 16px; }
-  .arrow.prev { left: 8px; }
-  .arrow.next { right: 8px; }
-  @media (hover: hover) { .arrow { display: grid; } }
+  .arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: rgba(16, 28, 72, .6); display: grid; place-items: center; color: var(--ink); }
+  .arrow svg { width: 18px; height: 18px; }
+  .arrow.prev { left: 6px; }
+  .arrow.next { right: 6px; }
 
   /* 四隅のポップアップ（品詞の違い・類義語・解説・覚え方） */
   .sheet-wrap { position: absolute; inset: 0; z-index: 30; }
@@ -1350,7 +1349,7 @@
     if (kind === 'core') openSphere(w); else openSheet(kind, w);
   };
 
-  const wordSize = w => Math.max(30, Math.min(56, Math.floor((screen.clientWidth - 60) / (w.word.length * .62))));
+  const wordSize = w => Math.max(28, Math.min(56, Math.floor((screen.clientWidth - 120) / (w.word.length * .62))));
   const showWord = i => {
     const n = detail.list.length;
     detail.i = (i + n) % n;

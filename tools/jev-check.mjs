@@ -103,6 +103,8 @@ const GROUPS = [
       wp_swap: ["単語ページの左上の角は「類義語」、右上の角は「品詞の違い」である。", false, 67],
       wp_monkey: ["単語ページのサルのアイコン（#i-monkey）のボタン（data-act=\"tips\"）を押すと openSheet('tips', …) が呼ばれ、「おさるさんの覚え方」のシートに w.tips[state.dialect]（方言設定に合わせた覚え方）が表示される。", true, 71],
       wp_onefinger: ["単語ページでは、1本の指で斜め（縦にも横にも動いた向き）に引っぱって離すと、動いた向き（dx, dy）から cornerFor で四隅の1つを決め、openCorner でその角のポップアップか別ページを開く。四隅のボタンをタップして開く動きも残っている。", true, 0],
+      wp_arrows_mobile: ["単語ページの前後の単語へ移る矢印ボタン（.arrow.prev と .arrow.next）は、スマホ（マウスを乗せられない端末）でも常に表示される。", true, 0],
+      wp_arrows_hover_only: ["単語ページの前後の矢印ボタンは、@media (hover: hover) のときだけ表示される。", false, 0],
       wp_twofinger_only: ["単語ページで四隅が開くのは、2本の指が同時に触れているときだけである。", false, 0],
       wp_onefinger_corner: ["単語ページでは、1本指で左右にスワイプすると四隅のどれかが開く。", false, 64],
     },
