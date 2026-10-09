@@ -2,10 +2,11 @@
 /**
  * さる単デモ 仕様照合（Jev 判定）
  *
- * 仕様書のハイライト（tools/spec-highlights-2026-09-23.json）が index.template.html に実装されているかを、
+ * 仕様書のハイライト（tools/spec-highlights-2026-10-01.json。9/23 ぶんは spec-highlights-2026-09-23.json）が index.template.html に実装されているかを、
  * TypeSafe の Jev（判定専用・入力 $0.042/Mtok・出力無料）に判定させる。抜粋＋型付き質問（Noul＝この記述は正しいか 0〜1）。
  * 逆の割り当て・旧仕様・別の秒数も同時に聞き、Jev が区別できているか（＝質問が効いているか）も確かめる。
- * Jev の state は 32k トークンまでなので、Test 側と TikTak・単語ページ側の2回に分けて送る。
+ * Jev の state は 32k トークンまでなので、Test 側／TikTak・単語ページ側／Progress・表示モード・起動演出側の3回に分けて送る。
+ * 質問の3つ目の値は仕様書の段落番号（0＝会話での追加依頼・メモ）。
  *
  * --facts を付けると、単語データ（品詞の違い・類義語・コアイメージの例文と訳）の正しさも Jev に聞く。
  * 低い値の行は「人が確かめる候補」であって、Jev の判定をそのまま正解とはしない。
@@ -23,7 +24,7 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const APP = path.resolve(HERE, "..");
 const html = readFileSync(path.join(APP, "index.template.html"), "utf8");
-const spec = JSON.parse(readFileSync(path.join(HERE, "spec-highlights-2026-09-23.json"), "utf8"));
+const spec = JSON.parse(readFileSync(path.join(HERE, "spec-highlights-2026-10-01.json"), "utf8"));
 const ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 const USD_PER_MTOK = 0.042;
 const THRESHOLD = 0.5;
@@ -65,8 +66,8 @@ const GROUPS = [
       "Test ページの JS（ラベル: 'ok'＝覚えた、'warn'＝もう少し、'no'＝全然覚えてない。flyOut(dx, dy, label) で仕分けを確定）": slice("/* ---------- Test (swipe) ---------- */", "const detailEl = $('#detail');"),
     },
     Q: {
-      tabs_order: ["タブバーのボタンは左から Words、TikTak、Test、Profile の順に並んでいる。", true, 53],
-      tabs_old: ["タブバーのボタンは左から Test、TikTak、Words、Profile の順に並んでいる。", false, 53],
+      tabs_order: ["タブバーのボタンは左から Words、TikTak、Test、Progress の順に並んでいる。", true, 53],
+      tabs_old: ["タブバーのボタンは左から Test、TikTak、Words、Progress の順に並んでいる。", false, 53],
       right_info: ["Test で右へ 90px より大きく水平ドラッグして離すと、flyOut を呼ばずに（仕分けせずに）カードを元に戻し、「解説」のシート（openSheet('kaisetsu', …)）を開く。", true, 83],
       right_no: ["Test で右へ 90px より大きく水平ドラッグして離すと、ラベル 'no'（全然覚えてない）で仕分けが確定する。", false, 83],
       left_warn: ["Test で左へ 90px より大きく水平ドラッグして離すと、ラベル 'warn'（もう少し）で確定する。", true, 84],
@@ -76,6 +77,13 @@ const GROUPS = [
       dpad: ["Test ページのカードの下に十字キーの形をしたアイコン（class=\"dpad\"）があり、上＝覚えた、左＝もう少し、下＝全然、右＝解説 と表示している。", true, 87],
       no_buttons: ["Test ページの HTML には、押して仕分けする「全然／もう少し／覚えた」のボタン（class=\"tbtn\" や data-rate）が無い。", true, 87],
       front_ipa: ["Test のカード表面では、発音記号（id=\"t-ipa\"）が単語（id=\"t-word\"）より上に置かれている。", true, 0],
+      setup_screen: ["Test ページは最初に設定画面（id=\"t-setup\"）を表示し、設定を選んで「スタート」ボタン（id=\"t-start\"）を押すとテストが始まる（startTest）。", true, 118],
+      dir_ja: ["出題の向きで「日本語 → 英語」（data-tdir=\"ja\"）を選ぶと、カードの表に日本語の意味、裏に英単語が出る。", true, 122],
+      dir_en_only: ["テストの出題は英語→日本語だけで、日本語→英語に切り替えることはできない。", false, 122],
+      order_opts: ["出題順として「登録順」「学習順」「ランダム」のどれかを選べる（data-torder）。", true, 126],
+      review_card: ["テストが終わると、「もう少し」「全然」にした単語の数を「今回、復習したほうがよい単語が◯語あります」と表示する。", true, 138],
+      review_flow: ["復習セッションは、①TikTakで高速復習 → ②Wordsで詳しく理解 → ③もう一度ミニテスト の順に進む（review.step が 1→2→3）。", true, 138],
+      review_reverse: ["復習セッションは、最初にミニテストを行い、最後に TikTak で復習する順に進む。", false, 138],
       back_syn: ["Test のカード裏面に類義語の欄（id=\"t-syn\"）があり、単語の類義語を並べて表示する。", true, 0],
     },
   },
@@ -85,6 +93,8 @@ const GROUPS = [
       "TikTak ページの HTML": slice("<!-- TikTak", "<!-- Words -->"),
       "TikTak ページの CSS（右の列）": lines(/\.tk-act|\.tk-rail|\.tk-check/),
       "TikTak ページの JS": slice("/* ---------- TikTak: 5秒で", "\n  renderWords();"),
+      "単語ページの CSS（奥行き）": lines(/\.d-back|\.d-sphere|cfloat|^  \.corner \{ box-shadow/),
+      "音声の JS": slice("const speakWord = ", "/* ---------- tabs ---------- */"),
       "単語ページ・コアイメージ・ポップアップの HTML": slice("<!-- 単語ページ", "<!-- /単語ページ -->") + "\n" + slice("<!-- コアイメージ（別ページ） -->", "    </div>\n  </div>\n</div>"),
       "単語ページの JS": slice("const detailEl = $('#detail');", "/* ---------- TikTak: 5秒で"),  // CSS にも同じ見出しがあるので JS の1行目から抜く
     },
@@ -100,6 +110,12 @@ const GROUPS = [
       wp_tr: ["単語ページの右上の角（data-corner=\"tr\"）は「類義語」で、押すと類義語の一覧（syn）がポップアップで出る。", true, 67],
       wp_bl: ["単語ページの左下の角（data-corner=\"bl\"）は「コアイメージ」で、押すとポップアップではなく別ページ（id=\"sphere\"）が開き、中央に単語とコアイメージ、周りに意味ごとの例文が並ぶ。", true, 70],
       wp_br: ["単語ページの右下の角（data-corner=\"br\"）は「解説」で、押すと解説（kaisetsu）がポップアップで出る。", true, 69],
+      ex_audio: ["単語ページの例文の横に音声ボタン（data-act=\"speak-ex\"）があり、押すと例文（detail.word.ex.en）を英語で読み上げる。", true, 94],
+      dialect_text: ["「解説」のシートには方言モードの切り替え（標準語／関西弁／名古屋弁、data-sdialect）があり、選んだ方言の文面（kaisetsuD）に切り替わる。", true, 101],
+      dialect_audio: ["「解説」のシートには音声ボタン（data-say-ja）があり、押すと表示中の解説文（#ja-text）を日本語で読み上げる（speakJa）。", true, 101],
+      dialect_none: ["解説の文面は標準語だけで、方言に切り替える手段は無い。", false, 101],
+      ety: ["コアイメージのページ（id=\"sphere\"）では、コアイメージの図（sp-map）の下に「語源」（id=\"sp-ety\"、w.ety）を表示する。", true, 104],
+      depth: ["単語ページの四隅（.corner）には影（box-shadow）と、ゆっくり漂うアニメーション（cfloat）が付き、背景には単語の画像をぼかして敷いている（d-back）。", true, 83],
       wp_swap: ["単語ページの左上の角は「類義語」、右上の角は「品詞の違い」である。", false, 67],
       wp_monkey: ["単語ページのサルのアイコン（#i-monkey）のボタン（data-act=\"tips\"）を押すと openSheet('tips', …) が呼ばれ、「おさるさんの覚え方」のシートに w.tips[state.dialect]（方言設定に合わせた覚え方）が表示される。", true, 71],
       wp_onefinger: ["単語ページでは、1本の指で斜め（縦にも横にも動いた向き）に引っぱって離すと、動いた向き（dx, dy）から cornerFor で四隅の1つを決め、openCorner でその角のポップアップか別ページを開く。四隅のボタンをタップして開く動きも残っている。", true, 0],
@@ -107,6 +123,30 @@ const GROUPS = [
       wp_arrows_hover_only: ["単語ページの前後の矢印ボタンは、@media (hover: hover) のときだけ表示される。", false, 0],
       wp_twofinger_only: ["単語ページで四隅が開くのは、2本の指が同時に触れているときだけである。", false, 0],
       wp_onefinger_corner: ["単語ページでは、1本指で左右にスワイプすると四隅のどれかが開く。", false, 64],
+    },
+  },
+  {
+    name: "Progress・表示モード・起動演出（10/1）",
+    parts: {
+      "タブバーの HTML": slice('<nav class="tabbar"', "</nav>"),
+      "起動演出の HTML": slice("<!-- 起動の演出", '<main class="views">'),
+      "Progress とアカウント下層ページの HTML": slice("<!-- Progress（元 Profile）", "<!-- My単語帳: label page"),
+      "配色の CSS（ライトモード）": lines(/data-theme="light"\] \{|--bg: #|--ink: rgb/),
+      "起動演出の CSS": lines(/\.splash\.go|@keyframes op/),
+      "起動演出・表示モード・学習記録・ほめる演出の JS": slice("// 起動の演出: ロゴ", "/* ---------- speech ---------- */"),
+      "Progress とアカウントの JS": slice("const WD = [", "/* ---------- My単語帳: label page ---------- */"),
+    },
+    Q: {
+      tab_progress: ["タブバーの4つ目のタブの表示名は「Progress」である。", true, 151],
+      tab_profile: ["タブバーの4つ目のタブの表示名は「Profile」である。", false, 151],
+      acct_sub: ["Progress ページのユーザーカードのボタン（id=\"me-card\"）を押すと、下層ページ（id=\"view-account\"）に移り、名前・メールアドレス・パスワード・サブスクを変更できる。", true, 154],
+      streak_pos: ["Progress ページの HTML では、連続学習の欄（id=\"streak\"）が、ユーザーカード（class=\"me\"）と My単語帳（class=\"bins\"）の間に置かれている。", true, 0],
+      stats: ["My Progress の欄（id=\"stats\"）には、これまで覚えた単語数・学習した日数・連続学習記録・テストの正答率が表示される。", true, 159],
+      cheer: ["覚えた単語数や連続日数が節目に届くと、紙吹雪（confetti）つきの全画面の演出（cheer）でほめる。", true, 159],
+      special: ["今月のスペシャル画像にはモザイクがかかっていて、今月アプリを開いた時間が 3.5 時間（SPECIAL_GOAL）に近づくほどタイルがはがれ、3.5 時間で全部見える。", true, 167],
+      special_instant: ["今月のスペシャル画像は、最初からモザイクなしで全部見える。", false, 167],
+      light: ["表示モードとしてライトモードを選べ、選ぶと html 要素に data-theme=\"light\" が付き、明るい地に濃い文字の配色へ切り替わる。", true, 65],
+      opening: ["起動時に、雲（clouds）が外へ開き、球体（world）が拡大して近づいてくる演出が流れ、「スキップ」ボタン（id=\"op-skip\"）で飛ばせる。", true, 0],
     },
   },
 ];
@@ -133,6 +173,7 @@ function factQuestions() {
   for (const w of WORDS) {
     w.forms.forEach((f, k) => { Q[`f_${w.id}_${k}`] = [`英語の「${f[0]}」は${f[1]}で、「${f[2]}」という意味で使われる。`, true, w.word]; });
     w.syn.forEach((x, k) => { Q[`s_${w.id}_${k}`] = [`英語の「${x[0]}」は「${x[1]}」という意味で、「${w.word}（${w.meaning}）」の類義語・言い換えとして挙げてよい。`, true, w.word]; });
+    Q[`y_${w.id}`] = [`英単語「${w.word}」の語源の説明として、次の文は一般的な語源辞典の内容と合っている：${w.ety}`, true, w.word];
     w.core.senses.forEach((x, k) => {
       const en = x[1].replace(/[[\]]/g, "");
       Q[`e_${w.id}_${k}`] = [`英文「${en}」は自然で文法的に正しい英語で、その日本語訳として「${x[2]}」は正しい。`, true, w.word];
