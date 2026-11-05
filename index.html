@@ -132,9 +132,10 @@
   .splash .mark { font-size: 40px; font-weight: 800; letter-spacing: .06em; line-height: 1.1; }
   .splash .tagline { font-size: 12px; font-weight: 600; letter-spacing: .28em; opacity: .75; }
   .splash .skip { position: absolute; right: 18px; bottom: calc(var(--bottom-inset) + 22px); padding: 6px 10px; border: 0; background: none; color: var(--logo-ink); font-size: 12px; font-weight: 600; opacity: .7; }
-  .splash.go .logo, .splash.go .skip { animation: opLogo .55s 1s ease-in forwards; }
-  .splash.go .clouds i { animation: opPart 1.35s calc(.95s + var(--d)) cubic-bezier(.5, 0, .2, 1) forwards; }
-  .splash.go .world { animation: opWorld 1.1s .95s ease-out forwards, opDive 1s 2.05s cubic-bezier(.6, 0, .9, .5) forwards; }
+  /* 10/29: 全体で約1秒短く（3.5秒→2.5秒）。ロゴの待ちと降下を詰める */
+  .splash.go .logo, .splash.go .skip { animation: opLogo .45s .55s ease-in forwards; }
+  .splash.go .clouds i { animation: opPart 1.05s calc(.5s + var(--d)) cubic-bezier(.5, 0, .2, 1) forwards; }
+  .splash.go .world { animation: opWorld .85s .5s ease-out forwards, opDive .8s 1.35s cubic-bezier(.6, 0, .9, .5) forwards; }
   @keyframes opLogo { to { opacity: 0; scale: 1.12; } }
   @keyframes opPart { to { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity: 0; } }
   @keyframes opWorld { to { opacity: 1; transform: translate(-50%, -50%) scale(.62); } }
@@ -507,6 +508,105 @@
   @keyframes confetti { to { transform: translate(var(--dx), 960px) rotate(var(--r)); } }
   @keyframes cheerPop { 0% { transform: scale(.2) rotate(-18deg); opacity: 0; } 60% { transform: scale(1.15) rotate(6deg); opacity: 1; } 100% { transform: scale(1); } }
 
+
+  /* ---------- ごほうび（10/29）: アイコンのまわりの飾り・名前のうしろのバッジ・称号・1日の目標 ---------- */
+  .av-wrap { position: relative; flex: none; width: 48px; height: 48px; --av: 48px; }
+  .av-wrap .avatar { position: relative; z-index: 1; width: 100%; height: 100%; font-size: calc(var(--av) * .38); }
+  .av-wrap .ring, .av-wrap .deco { position: absolute; pointer-events: none; }
+  .av-wrap[data-frame="glow"] .ring { inset: -5px; border-radius: 50%; background: conic-gradient(from var(--ga, 0deg), #fff5c8, #5ac8ff, #9b6bff, #ff8fb8, #ffe08a, #fff5c8); animation: avHue 5s linear infinite; }
+  .av-wrap[data-frame="glow"] .deco { inset: -12px; background: radial-gradient(circle at 12% 22%, #fff 0 1.6px, transparent 2.4px), radial-gradient(circle at 88% 16%, #ffe08a 0 2px, transparent 3px), radial-gradient(circle at 92% 78%, #fff 0 1.4px, transparent 2.2px), radial-gradient(circle at 6% 84%, #a8fbe0 0 1.8px, transparent 2.6px); animation: avTwinkle 1.8s ease-in-out infinite alternate; }
+  .av-wrap[data-frame="crown"] .ring { inset: -4px; border-radius: 50%; border: 2.5px solid #f6c443; box-shadow: 0 0 14px rgba(246, 196, 67, .55); }
+  .av-wrap[data-frame="crown"] .deco { z-index: 2; left: 50%; top: calc(var(--av) * -.42); width: calc(var(--av) * .62); height: calc(var(--av) * .5); transform: translateX(-50%) rotate(-12deg); color: #f6c443; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .35)); }
+  .av-wrap[data-frame="orbit"] .ring { inset: -9px -14px; border-radius: 50%; border: 1.5px solid rgba(90, 200, 255, .8); transform: rotate(-18deg); }
+  .av-wrap[data-frame="orbit"] .deco { inset: -9px -14px; transform: rotate(-18deg); animation: avSpin 6s linear infinite; }
+  .av-wrap[data-frame="orbit"] .deco::after { content: ""; position: absolute; left: 50%; top: -4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #9b6bff; box-shadow: 0 0 8px #9b6bff; }
+  .av-wrap[data-frame="xmas"] .ring { inset: -6px; border-radius: 50%; background: repeating-conic-gradient(#1f9d55 0 18deg, #2fbf6b 18deg 36deg); -webkit-mask: radial-gradient(closest-side, transparent 78%, #000 80%); mask: radial-gradient(closest-side, transparent 78%, #000 80%); }
+  .av-wrap[data-frame="xmas"] .deco { inset: -7px; background: radial-gradient(circle at 50% 4%, #e23b4e 0 3px, transparent 3.6px), radial-gradient(circle at 96% 50%, #ffd34d 0 2.6px, transparent 3.2px), radial-gradient(circle at 50% 96%, #e23b4e 0 3px, transparent 3.6px), radial-gradient(circle at 4% 50%, #ffd34d 0 2.6px, transparent 3.2px); }
+  @property --ga { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  @keyframes avSpin { to { rotate: 360deg; } }
+  @keyframes avHue { to { --ga: 360deg; } }
+  @keyframes avTwinkle { from { opacity: .35; } to { opacity: 1; } }
+  .me .me-t b { display: flex; align-items: center; gap: 5px; }
+  .me .me-t b .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nm.gold { background: linear-gradient(100deg, #f6c443, #fff1b8 45%, #e39a16); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: 800; }
+  .badge { flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px; }
+  .badge svg { width: 20px; height: 20px; }
+  .badge.bronze { color: #c98a52; } .badge.silver { color: #b9c4d6; } .badge.gold { color: #f6c443; }
+  .badge.fire7 { position: relative; color: #ff9a3c; }
+  .badge.fire7 b { position: absolute; right: -3px; bottom: -3px; padding: 0 3px; border-radius: 6px; background: #ff9a3c; color: #1a0f00; font-size: 9px; font-weight: 800; line-height: 1.3; }
+  .title-chip { display: inline-block !important; margin-top: 4px; padding: 1px 8px; border: 1px solid rgba(var(--accent-rgb), .45); border-radius: 999px; color: var(--cyan) !important; font-size: 11px !important; font-weight: 700; white-space: nowrap; }
+  .me .av-wrap { margin: 2px; }
+  .sec-title .rw-count { margin-left: 6px; letter-spacing: 0; color: var(--ink-2); }
+  .rewards { display: grid; gap: 14px; margin-bottom: 26px; padding: 14px; border: 1px solid var(--line-soft); border-radius: 18px; background: rgba(var(--card-rgb), .3); }
+  .rw-k { margin: 0 0 8px; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .rw-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .rw { position: relative; display: grid; justify-items: center; gap: 6px; padding: 14px 2px 8px; border: 1px solid var(--line-soft); border-radius: 14px; background: rgba(var(--card-rgb), .35); text-align: center; transition: transform .1s, border-color .2s; }
+  .rw:active { transform: scale(.96); }
+  .rw .av-wrap { --av: 34px; width: 34px; height: 34px; }
+  .rw .avatar { box-shadow: none; }
+  .rw .badge { width: 34px; height: 34px; } .rw .badge svg { width: 30px; height: 30px; }
+  .rw .badge.fire7 b { font-size: 11px; }
+  .rw .rn { font-size: 10.5px; font-weight: 700; line-height: 1.25; }
+  .rw .rc { font-size: 9.5px; line-height: 1.3; color: var(--ink-3); }
+  .rw.locked > :not(.rc):not(.lk) { opacity: .28; filter: grayscale(1); }
+  .rw .lk { position: absolute; top: 6px; right: 6px; width: 13px; height: 13px; color: var(--ink-3); }
+  .rw[aria-pressed="true"] { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(var(--accent-rgb), .25); }
+  .rw[aria-pressed="true"]::after { content: "つけている"; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); padding: 0 6px; border-radius: 999px; background: var(--cyan); color: var(--on-ink); font-size: 9px; font-weight: 700; white-space: nowrap; }
+  .rw .new { position: absolute; top: -7px; right: -4px; padding: 0 5px; border-radius: 999px; background: var(--no); color: #fff; font-size: 9px; font-weight: 800; }
+  .rw-note { margin: 0; font-size: 11px; line-height: 1.6; color: var(--ink-3); }
+  /* 1日の目標（個人目標） */
+  .st-goal { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 10px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255, 154, 60, .4); font-size: 12px; }
+  .st-goal .gk { font-weight: 700; }
+  .st-goal .gv { justify-self: end; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .st-goal .gv b { color: var(--ink); font-size: 15px; }
+  .st-goal .bar { grid-column: 1 / -1; height: 6px; overflow: hidden; border-radius: 3px; background: rgba(var(--ink-rgb), .1); }
+  .st-goal .bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #ff9a3c, #ffd34d); transition: width .4s var(--ease); }
+  .st-goal .seg { grid-column: 1 / -1; justify-self: start; }
+  .st-goal .seg-btn { padding: 4px 10px; font-size: 11.5px; }
+  /* 連続が切れそうなとき（「やばい」と思わせる仕掛け） */
+  .streak.risk { border-color: rgba(255, 107, 139, .6); background: linear-gradient(140deg, rgba(255, 107, 139, .16), rgba(var(--card-rgb), .3)); }
+  .st-msg .risk { display: block; color: var(--no); font-weight: 700; }
+  .st-msg .risk b { font-variant-numeric: tabular-nums; }
+  /* リザルト画面（達成画面の作り直し・10/29）: 共有したくなる結果カード */
+  .rs-card { position: relative; overflow: hidden; margin: 0 auto 12px; max-width: 340px; padding: 16px 16px 14px; border: 1px solid rgba(90, 200, 255, .35); border-radius: 22px; background: radial-gradient(120% 90% at 85% 0%, rgba(155, 107, 255, .35), transparent 60%), radial-gradient(90% 80% at 0% 100%, rgba(90, 200, 255, .25), transparent 60%), linear-gradient(160deg, #13214d, #070c22); color: #f3f6ff; text-align: left; box-shadow: 0 18px 40px var(--shadow); }
+  .rs-top { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; letter-spacing: .04em; }
+  .rs-top svg { width: 20px; height: 20px; color: #f6b73c; }
+  .rs-top span { margin-left: auto; font-weight: 600; color: rgba(243, 246, 255, .6); letter-spacing: 0; }
+  .rs-who { display: flex; align-items: center; gap: 12px; margin: 14px 0 12px; }
+  .rs-who .av-wrap { --av: 42px; width: 42px; height: 42px; margin: 4px; }
+  .rs-who b { display: flex; align-items: center; gap: 5px; font-size: 15px; }
+  .rs-who .title-chip { color: #8fd6ff !important; border-color: rgba(143, 214, 255, .5); }
+  .rs-main { display: flex; align-items: center; gap: 14px; }
+  .rs-ring { flex: none; width: 92px; height: 92px; }
+  .rs-ring circle { fill: none; stroke-width: 9; }
+  .rs-ring .bg { stroke: rgba(255, 255, 255, .12); }
+  .rs-ring .fg { stroke: url(#rs-grad); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 1s var(--ease) .2s; }
+  .rs-ring text { fill: #fff; font-family: var(--font); font-size: 22px; font-weight: 800; }
+  .rs-main .lbl { font-size: 11px; color: rgba(243, 246, 255, .65); }
+  .rs-main .big { display: block; font-size: 15px; font-weight: 800; line-height: 1.4; }
+  .rs-card .counts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin: 12px 0 10px; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, .1); border-bottom: 1px solid rgba(255, 255, 255, .1); text-align: center; }
+  .rs-card .counts b { font-size: 22px; }
+  .rs-card .counts span { color: rgba(243, 246, 255, .65); }
+  .rs-stats { display: grid; grid-template-columns: repeat(3, 1fr); text-align: center; }
+  .rs-stats div { display: grid; gap: 1px; font-size: 10.5px; color: rgba(243, 246, 255, .65); }
+  .rs-stats b { color: #fff; font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .rs-new { margin-top: 10px; padding: 7px 10px; border-radius: 12px; background: rgba(246, 196, 67, .16); color: #ffe08a; font-size: 12px; font-weight: 700; text-align: center; }
+  .rs-share { display: flex; justify-content: center; margin-bottom: 10px; }
+  .rs-share .ghost-btn { display: inline-flex; align-items: center; gap: 6px; }
+  .rs-share svg { width: 16px; height: 16px; }
+  .done .rs-next { margin: 0 0 14px; color: var(--ink); font-size: 13px; font-weight: 600; line-height: 1.6; }
+  .sh-img { display: block; width: 100%; max-width: 280px; margin: 0 auto 12px; border-radius: 14px; box-shadow: 0 10px 30px var(--shadow); }
+  .sh-save { display: flex; justify-content: center; text-decoration: none; }
+  /* おさるさんの覚え方: バイリンガール英会話の動画をアプリの中で再生（YouTube に飛ばさない） */
+  .yt-box { margin-top: 14px; }
+  .yt-k { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin: 0 0 6px; font-size: 12px; font-weight: 700; color: var(--ink-2); }
+  .yt-k span { font-weight: 500; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .yt-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 14px; background: #000; }
+  .yt-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .yt-line { margin: 8px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-2); }
+  .yt-line em { font-style: normal; font-weight: 700; color: var(--cyan); }
+  .yt-title { margin: 4px 0 0; font-size: 11px; line-height: 1.5; color: var(--ink-3); }
+
   /* ---------- 単語ページ: 中央＋四隅（仕様書 2026-09-23） ---------- */
   .detail { position: absolute; inset: 0; z-index: 20; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; background: radial-gradient(120% 70% at 50% 42%, var(--glow) 0%, var(--bg) 72%); animation: rise .38s var(--ease); }
   .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-soft); background: rgba(var(--card-rgb), .45); display: grid; place-items: center; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .1s, color .2s; }
@@ -641,7 +741,7 @@
   @keyframes sheetUp { from { transform: translateY(40%); opacity: 0; } }
   @keyframes spIn { from { opacity: 0; scale: .85; } }
 
-  /* Test: 「覚えた」は上へ昇天していく（キラキラ） */
+  /* Test: 「わかった」は上へ昇天していく（キラキラ） */
   .tcard.ascend { transition: transform 1.05s cubic-bezier(.55, 0, .35, 1), opacity .95s ease-in; filter: drop-shadow(0 0 22px rgba(255, 236, 170, .85)) drop-shadow(0 0 6px rgba(70, 224, 162, .9)); }
   .sparkles { position: absolute; inset: -60px 0 0; pointer-events: none; z-index: 3; }
   .sparkles i {
@@ -674,7 +774,7 @@
   .tk-count { position: absolute; right: 16px; color: rgba(255, 255, 255, .7); font-size: 12px; font-variant-numeric: tabular-nums; }
   .tk-hint { position: absolute; left: 50%; top: calc(var(--top-inset) + 48px); transform: translateX(-50%); z-index: 4; padding: 6px 12px; border-radius: 999px; background: rgba(0, 0, 0, .5); color: rgba(255, 255, 255, .85); font-size: 12px; white-space: nowrap; transition: opacity .5s; pointer-events: none; }
   .tk-hint.off { opacity: 0; }
-  .tk-rail { position: absolute; right: 10px; bottom: 122px; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .tk-rail { position: absolute; right: 10px; bottom: 26px; z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 10px; }
   .tk-act { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: 0; padding: 0; color: #fff; font-size: 11px; font-weight: 600; text-shadow: 0 1px 6px rgba(0, 0, 0, .6); transition: transform .1s; }
   .tk-act:active { transform: scale(.94); }
   .tk-act .ring { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .38); border: 1px solid rgba(255, 255, 255, .18); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); transition: box-shadow .2s, color .2s; }
@@ -696,7 +796,7 @@
   .tk-pause { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 4; width: 76px; height: 76px; border-radius: 50%; display: grid; place-items: center; background: rgba(0, 0, 0, .42); color: #fff; opacity: 0; transition: opacity .2s; pointer-events: none; }
   .tk-pause svg { width: 36px; height: 36px; margin-left: 4px; }
   .view.tiktak.paused .tk-pause { opacity: 1; }
-  /* TikTak 確認モード: 流れる単語に 覚えた／全然 をタップ → My単語帳 */
+  /* TikTak: 流れる単語に わかった／わからない をタップ → My単語帳 */
   .tk-act.rate.ok .ring { color: var(--ok); border-color: rgba(70, 224, 162, .55); }
   .tk-act.rate.no .ring { color: var(--no); border-color: rgba(255, 107, 139, .55); }
   .tk-stamp { position: absolute; left: 50%; top: 40%; z-index: 6; transform: translate(-50%, -50%) rotate(-8deg) scale(.6); padding: 8px 18px; border: 3px solid; border-radius: 10px; background: rgba(0, 0, 0, .45); font-size: 28px; font-weight: 800; letter-spacing: .04em; opacity: 0; pointer-events: none; transition: opacity .2s, transform .28s var(--pop); }
@@ -735,7 +835,7 @@
     <symbol id="i-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-replay" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.5-5.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-test" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M9 8h6M9 12h6M9 16h3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
-    <symbol id="i-tiktak" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.5 9l4.5 3-4.5 3z" fill="currentColor"/></symbol>
+    <symbol id="i-tiktak" viewBox="0 0 24 24"><circle cx="12" cy="12.6" r="8.4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 7.8v4.8l3.2 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.6 2.4h4.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
     <symbol id="i-doc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 12l2.5-6 2.5 6M10.3 10h3.4M9 16h6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
     <symbol id="i-rings" viewBox="0 0 24 24"><circle cx="9" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="15" cy="12" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
     <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 0.5v1M4 4l.8.8M20 4l-.8.8M1.5 11h1M21.5 11h1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
@@ -743,6 +843,10 @@
     <symbol id="i-monkey" viewBox="0 0 48 48"><path fill="currentColor" fill-rule="evenodd" d="M7.6 15.7a6.8 6.8 0 1 0 0 13.6a6.8 6.8 0 1 0 0-13.6zM7.9 19.5a3 3 0 1 1 0 6a3 3 0 1 1 0-6zM40.4 15.7a6.8 6.8 0 1 0 0 13.6a6.8 6.8 0 1 0 0-13.6zM40.1 19.5a3 3 0 1 1 0 6a3 3 0 1 1 0-6z"/><path fill="currentColor" d="M21 8.2L26.2 2.4L28.6 8.2z"/><path fill="currentColor" fill-rule="evenodd" d="M15.2 7.6H32.8L39.6 17.6V28.4L33.4 34.8H14.6L8.4 28.4V17.6zM24 17.2C21.6 11.6 12.6 12.6 12.6 19.6C12.6 24.6 17.6 27.6 20.8 31.4H27.2C30.4 27.6 35.4 24.6 35.4 19.6C35.4 12.6 26.4 11.6 24 17.2z"/><ellipse cx="24" cy="34" rx="9.6" ry="8.4" fill="currentColor"/></symbol>
     <symbol id="i-progress" viewBox="0 0 24 24"><path d="M4 20V11M10 20V5M16 20v-7M21 20H3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2.5c.6 3.4 5.8 5.6 5.8 11.2A5.8 5.8 0 0 1 6.2 13.700c0-2 1-3.400 2.300-4.500c.2 1.600.9 2.600 2 3.100C10 9 10.600 5 12 2.500z" fill="currentColor"/><path d="M12 13.500c1.300 1.100 2.200 2.100 2.200 3.600a2.200 2.200 0 0 1-4.400 0c0-1.500.9-2.500 2.200-3.600z" fill="#ffe08a"/></symbol>
+    <symbol id="i-crown" viewBox="0 0 24 20"><path d="M2 6.5l5 4.2L12 2l5 8.7 5-4.2-2 11H4z" fill="currentColor"/><circle cx="2" cy="6" r="1.8" fill="currentColor"/><circle cx="12" cy="1.8" r="1.8" fill="currentColor"/><circle cx="22" cy="6" r="1.8" fill="currentColor"/><path d="M4.4 15.2h15.2" stroke="rgba(0,0,0,.25)" stroke-width="1.4"/></symbol>
+    <symbol id="i-medal" viewBox="0 0 24 24"><path d="M7 2h4l1.6 6.4-3.2 1.2zM17 2h-4l-1.6 6.4 3.2 1.2z" fill="currentColor" opacity=".55"/><circle cx="12" cy="15" r="7" fill="currentColor"/><circle cx="12" cy="15" r="5.2" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1"/><path d="M12 11.4l1.1 2.2 2.4.35-1.75 1.7.42 2.4L12 16.9l-2.17 1.15.42-2.4-1.75-1.7 2.4-.35z" fill="rgba(255,255,255,.55)"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12.5V19a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10.5" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
     <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 2.5v2.500M12 19v2.500M2.500 12H5M19 12h2.500M5.300 5.300l1.800 1.800M16.900 16.900l1.800 1.800M5.300 18.700l1.800-1.800M16.900 7.100l1.800-1.800" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
     <symbol id="i-words" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
     <symbol id="i-profile" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
@@ -756,9 +860,9 @@
     <p>英語学習者の、英語学習者による、英語学習者のための単語帳。動く試作です。</p>
     <ol>
       <li><b>Words</b> → 単語をタップ。四隅（品詞の違い／類義語／コアイメージと語源／解説）とサルの Tips。例文も音声で聞けて、解説は方言でも</li>
-      <li><b>TikTak</b> → 5秒で次の単語へ。右の「覚えた／全然」で仕分け</li>
-      <li><b>Test</b> → 出題を設定してスタート。終わると復習（TikTak → Words → ミニテスト）</li>
-      <li><b>Progress</b> → 連続日数・学習記録・今月のスペシャル画像。右上でライト／ダーク</li>
+      <li><b>TikTak</b> → 5秒で次の単語へ。右の「わかった／わからない」で仕分け</li>
+      <li><b>Test</b> → 出題を設定してスタート。↑わかった ←惜しい ↓わからない →解説。終わると結果カード（シェアできる）と復習</li>
+      <li><b>Progress</b> → 連続日数と1日の目標・ごほうび（アイコンの飾り・名前のバッジ・称号）・学習記録・スペシャル画像</li>
     </ol>
     <p class="note-foot">スマホで開くと全画面のアプリになります。</p>
   </aside>
@@ -822,9 +926,9 @@
             <article class="tcard ghost g2" aria-hidden="true"><div class="tcard-inner"><div class="face"></div></div></article>
             <article class="tcard ghost g1" aria-hidden="true"><div class="tcard-inner"><div class="face"><h3 class="big" id="g-word">next</h3></div></div></article>
             <article class="tcard" id="tcard" aria-live="polite">
-              <div class="stamp ok">覚えた</div>
-              <div class="stamp warn">もう少し</div>
-              <div class="stamp no">全然</div>
+              <div class="stamp ok">わかった</div>
+              <div class="stamp warn">惜しい</div>
+              <div class="stamp no">わからない</div>
               <div class="stamp info">解説</div>
               <div class="tcard-inner">
                 <div class="face front">
@@ -847,7 +951,10 @@
             <div class="done">
               <h3 id="done-title">今日の分はおしまい</h3>
               <p id="done-sub">結果は Progress の My単語帳に入りました</p>
-              <div class="counts" id="done-counts"></div>
+              <!-- リザルト画面（10/29）: そのまま SNS に出せる結果カード -->
+              <div class="rs-card" id="rs-card"></div>
+              <div class="rs-share"><button class="ghost-btn primary" type="button" id="rs-share"><svg aria-hidden="true"><use href="#i-share"/></svg>結果をシェア</button></div>
+              <p class="rs-next" id="rs-next"></p>
               <div id="rv-slot"></div>
               <div class="btns">
                 <button class="ghost-btn primary" type="button" id="t-again">もう一回</button>
@@ -855,12 +962,12 @@
               </div>
             </div>
           </div>
-          <div class="dpad" role="img" aria-label="十字キー：上＝覚えた、左＝もう少し、下＝全然、右＝解説">
-            <span class="up">↑ 覚えた</span>
-            <span class="left">← もう少し</span>
+          <div class="dpad" role="img" aria-label="十字キー：上＝わかった、左＝惜しい、下＝わからない、右＝解説">
+            <span class="up">↑ わかった</span>
+            <span class="left">← 惜しい</span>
             <span class="mid">●</span>
             <span class="right">解説 →</span>
-            <span class="down">↓ 全然</span>
+            <span class="down">↓ わからない</span>
           </div>
           <div class="test-foot"><span id="t-progress"></span><button class="link-btn" type="button" id="t-undo" hidden>1つ戻す</button><button class="link-btn" type="button" id="t-config">出題の設定</button></div>
           </div>
@@ -875,7 +982,7 @@
             <span class="tk-count" id="tk-count" aria-live="polite"></span>
           </div>
           <div class="tk-rv" id="tk-rv" hidden><span>復習 1/3・TikTakで高速復習</span><button class="go" type="button" id="tk-rv-next">Wordsで詳しく →</button><button class="x" type="button" id="tk-rv-x" aria-label="復習をやめる"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
-          <div class="tk-hint" id="tk-hint">5秒で次の単語へ。覚えた／全然で仕分け、タップで一時停止</div>
+          <div class="tk-hint" id="tk-hint">5秒で次の単語へ。わかった／わからないで仕分け、タップで一時停止</div>
           <div class="tk-feed" id="tk-feed"></div>
           <div class="tk-pause" aria-hidden="true"><svg><use href="#i-play"/></svg></div>
           <div class="tk-prog" aria-hidden="true"><i id="tk-bar"></i></div>
@@ -907,18 +1014,20 @@
             <button class="icon-btn" type="button" id="theme-quick" aria-label="ライトモードとダークモードを切り替える"><svg aria-hidden="true"><use href="#i-sun"/></svg></button>
           </header>
           <div class="me">
-            <div class="avatar" aria-hidden="true" id="me-av">S</div>
-            <div class="me-t"><b id="me-name">さる単ユーザー</b><span id="me-mail">demo@example.com</span></div>
+            <div class="av-wrap" id="me-avw" aria-hidden="true"></div>
+            <div class="me-t"><b><span class="nm" id="me-name">さる単ユーザー</span><span id="me-badge"></span></b><span class="title-chip" id="me-title">はじめの一歩</span></div>
             <span class="plan" id="me-plan">メンバー</span>
             <svg class="me-chev" aria-hidden="true"><use href="#i-right"/></svg>
             <button class="me-open" type="button" id="me-card" aria-label="アカウントと設定を開く"></button>
           </div>
           <div class="streak" id="streak"></div>
+          <p class="sec-title">ごほうび<span class="rw-count" id="rw-count"></span></p>
+          <div class="rewards" id="rewards"></div>
           <p class="sec-title">MY単語帳</p>
           <div class="bins" role="group" aria-label="My単語帳">
-            <button class="bin" type="button" data-bin="ok" style="--c: var(--ok)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-ok">0</b><span>もう覚えた</span></button>
-            <button class="bin" type="button" data-bin="warn" style="--c: var(--warn)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-warn">0</b><span>もう少しで<br>覚えられそう</span></button>
-            <button class="bin" type="button" data-bin="no" style="--c: var(--no)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-no">0</b><span>全然<br>覚えてない</span></button>
+            <button class="bin" type="button" data-bin="ok" style="--c: var(--ok)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-ok">0</b><span>わかった</span></button>
+            <button class="bin" type="button" data-bin="warn" style="--c: var(--warn)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-warn">0</b><span>惜しい</span></button>
+            <button class="bin" type="button" data-bin="no" style="--c: var(--no)"><svg class="chev" aria-hidden="true"><use href="#i-right"/></svg><b id="c-no">0</b><span>わからない</span></button>
           </div>
           <div class="binbar" aria-hidden="true"><i class="ok" id="bar-ok"></i><i class="warn" id="bar-warn"></i><i class="no" id="bar-no"></i></div>
           <p class="sec-title">MY PROGRESS</p>
@@ -940,7 +1049,7 @@
             <div class="sp-demo"><button class="ghost-btn" type="button" id="sp-add">＋30分 進める（デモ）</button><button class="link-btn" type="button" id="sp-reset">戻す</button></div>
           </div>
           <p class="demo-note" id="demo-note">学習日数・連続記録・正答率には、デモ用の仮の記録が入っています。</p>
-          <p class="version">さる単 デモ v0.6</p>
+          <p class="version">さる単 デモ v0.7</p>
         </section>
 
         <!-- アカウント・設定（Progress のユーザーカードから開く下層ページ） -->
@@ -990,7 +1099,7 @@
         <section class="view page" id="view-bin" aria-labelledby="h-bin">
           <header class="view-head">
             <button class="back" type="button" id="bin-back"><svg aria-hidden="true"><use href="#i-left"/></svg>Progress</button>
-            <h2 id="h-bin">もう覚えた</h2>
+            <h2 id="h-bin">わかった</h2>
             <p class="sub" id="bin-sub">0語</p>
           </header>
           <div class="search" id="bin-search">
@@ -1274,13 +1383,22 @@
     }
   ];
   const DIALECT_NAME = { std: '標準語', ksb: '関西弁', ngy: '名古屋弁' };
-  const RATE_NAME = { ok: 'もう覚えた', warn: 'もう少しで覚えられそう', no: '全然覚えてない' };
+  const RATE_NAME = { ok: 'わかった', warn: '惜しい', no: 'わからない' };
+
+  // 単語ごとの「バイリンガール英会話」の動画と、その単語が出てくる秒数（字幕から機械で探した実データ）
+  // 2026-11-05 にチャンネルの新しい動画から字幕を取って探した。見つからない単語は「全動画から抽出したあとで入る」と出す
+  const YT = {
+    explore: { id: 'LYGKrHIlKEA', t: 129, hit: 'explore', line: "So let's explore Sedona!", title: 'セドナで過ごす一日。私たちのリアルな朝・昼・晩！食事から過ごし方まで丸々シェア！☀️ // 🇺🇸US ROAD TRIP Day 32 📍Sedona〔#1298〕' },
+    genuine: { id: 'eLxjnibBF-U', t: 1586, hit: 'genuinely', line: 'She seemed so genuinely excited and delighted.', title: 'グランドキャニオンでの最高な一日に悲劇が😭  🇺🇸US ROAD TRIP Day 31📍Grand Canyon〔#1295〕' },
+    silly: { id: 'ZyhBqUfKRf4', t: 552, hit: 'silly', line: "Now, that sounds silly, but it's true.", title: '自分らしく生きるために大切なこと。新年の目標を立てる前に。【ネイティブ英語トーク👂】〔#1311〕' }
+  };
 
   /* ---------- state + storage ---------- */
   const KEY = 'sarutan-demo:v1';
   const state = { tab: 'words', sort: 'alpha', q: '', dialect: 'std', notify: true, theme: 'dark', ratings: {}, bin: 'ok', binSort: 'alpha', binQ: '',
     user: { name: 'さる単ユーザー', email: 'demo@example.com', plan: 'メンバー' },
     testPrefs: { scope: 'all', dir: 'en', order: 'random' },
+    reward: { frame: 'glow', badge: 'fire7', goal: 10 },
     log: null };
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
@@ -1290,10 +1408,11 @@
     if (saved.theme) state.theme = saved.theme;
     if (saved.user) Object.assign(state.user, saved.user);
     if (saved.testPrefs) Object.assign(state.testPrefs, saved.testPrefs);
+    if (saved.reward) Object.assign(state.reward, saved.reward);
     if (saved.log && saved.log.days) state.log = saved.log;
   } catch (e) { /* storage unavailable: run from defaults */ }
   const save = () => {
-    try { localStorage.setItem(KEY, JSON.stringify({ dialect: state.dialect, notify: state.notify, theme: state.theme, ratings: state.ratings, user: state.user, testPrefs: state.testPrefs, log: state.log })); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ dialect: state.dialect, notify: state.notify, theme: state.theme, ratings: state.ratings, user: state.user, testPrefs: state.testPrefs, reward: state.reward, log: state.log })); } catch (e) { /* ignore */ }
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -1318,7 +1437,7 @@
   // 起動の演出: ロゴ → 雲が割れる → 上空から Word Sphere へ降りていく → アプリ。スキップ可
   const splash = $('#splash');
   const OP_CLOUDS = [[18, 12, 78], [70, 8, 86], [48, 26, 70], [8, 38, 72], [88, 34, 80], [30, 50, 66], [70, 54, 74], [50, 44, 60], [12, 68, 82], [88, 72, 78], [44, 78, 88], [66, 92, 80], [20, 94, 74], [50, 62, 58]];
-  $('#op-clouds').innerHTML = OP_CLOUDS.map(([x, y, w], k) => `<i style="--x:${x}%;--y:${y}%;--w:${w}%;--dx:${((x - 50) * 3.2).toFixed(0)}%;--dy:${((y - 50) * 2.6).toFixed(0)}%;--d:${(k % 5) * 60}ms"></i>`).join('');
+  $('#op-clouds').innerHTML = OP_CLOUDS.map(([x, y, w], k) => `<i style="--x:${x}%;--y:${y}%;--w:${w}%;--dx:${((x - 50) * 3.2).toFixed(0)}%;--dy:${((y - 50) * 2.6).toFixed(0)}%;--d:${(k % 5) * 45}ms"></i>`).join('');
   $('#op-world').innerHTML = '<i class="grid"></i>' + [['explore', 50, 30], ['afford', 24, 44], ['genuine', 76, 42], ['reliable', 30, 66], ['silly', 70, 68], ['qualified', 50, 54]].map(([t, x, y]) => `<span style="left:${x}%;top:${y}%">${t}</span>`).join('');
   let opTimer = null;
   const endOpening = () => { clearTimeout(opTimer); splash.classList.add('out'); };
@@ -1327,7 +1446,7 @@
     splash.classList.remove('out', 'go'); void splash.offsetWidth;
     if (RM) { opTimer = setTimeout(endOpening, 50); return; }
     splash.classList.add('go');
-    opTimer = setTimeout(endOpening, 3050);
+    opTimer = setTimeout(endOpening, 2100);
   };
   $('#op-skip').addEventListener('click', endOpening);
   playOpening();
@@ -1379,9 +1498,12 @@
   $('#cheer-ok').addEventListener('click', () => { cheerEl.hidden = true; });
   const hitMilestone = (key, title, body) => { if (log.celebrated[key]) return false; log.celebrated[key] = 1; save(); cheer(title, body); return true; };
   const checkMilestones = () => {
+    const fresh = claimRewards();
+    if (fresh.length) { cheerReward(fresh[fresh.length - 1]); return; }
+    if (todayCount() >= state.reward.goal && hitMilestone('g:' + dayKey(), '今日の目標、達成！', `${state.reward.goal}語の目標をクリアしました。決めたことをやり切れる人は、必ず伸びます。明日もこの調子で。`)) return;
     const n = learned(); const st = streakNow();
     // 覚えた単語の節目。上の節目に届いたら、飛び越えた下の節目はあとから出さない
-    const L = [[WORDS.length, 'all', `全${WORDS.length}語、コンプリート！`, 'すごすぎます。ここまでやり切れる人は、ほんの一握りです。おさるさんも拍手が止まりません。'], [3, 'l3', '3語おぼえた！', 'その調子です。3語おぼえられた人は、30語もおぼえられます。今日のあなた、最高です。'], [1, 'l1', 'はじめての「覚えた」！', '最初の1語がいちばんえらい。ここから、ことばの世界が広がっていきます。']];
+    const L = [[WORDS.length, 'all', `全${WORDS.length}語、コンプリート！`, 'すごすぎます。ここまでやり切れる人は、ほんの一握りです。おさるさんも拍手が止まりません。'], [3, 'l3', '3語おぼえた！', 'その調子です。3語おぼえられた人は、30語もおぼえられます。今日のあなた、最高です。'], [1, 'l1', 'はじめての「わかった」！', '最初の1語がいちばんえらい。ここから、ことばの世界が広がっていきます。']];
     const top = L.find(x => n >= x[0]);
     if (top) { L.filter(x => x[0] < top[0]).forEach(x => { log.celebrated[x[1]] = 1; }); if (hitMilestone(top[1], top[2], top[3])) return; }
     const s = STREAK_MS.filter(x => st >= x).pop();
@@ -1392,6 +1514,44 @@
     const k = dayKey(); log.days[k] = (log.days[k] || 0) + 1; log.seen[id] = Date.now();
     log.best = Math.max(log.best || 0, streakNow()); save();
   };
+
+
+  /* ---------- ごほうび（10/29）: アイコンのまわりの飾り・名前のうしろのバッジ・称号・1日の目標 ---------- */
+  // デモは6語しかないので、語数の節目を小さくしている（本番の目安は real に書く）
+  const bestNow = () => Math.max(log.best || 0, streakNow());
+  const inXmas = k => k.slice(5) >= '12-01' && k.slice(5) <= '12-25';
+  const REWARDS = [
+    { id: 'glow', kind: 'frame', name: 'キラキラ', cond: '3日連続', ok: () => bestNow() >= 3 },
+    { id: 'crown', kind: 'frame', name: '王冠', cond: `${WORDS.length}語すべて「わかった」`, real: '本番は1,000語', ok: () => learned() >= WORDS.length },
+    { id: 'orbit', kind: 'frame', name: 'Sphereの輪', cond: '30日連続', ok: () => bestNow() >= 30 },
+    { id: 'xmas', kind: 'frame', name: 'クリスマス', cond: '12/1〜12/25に学習', real: '期間限定', ok: () => Object.keys(log.days).some(inXmas) },
+    { id: 'bronze', kind: 'badge', name: '銅メダル', cond: '1語「わかった」', real: '本番は100語', ok: () => learned() >= 1 },
+    { id: 'silver', kind: 'badge', name: '銀メダル', cond: '3語「わかった」', real: '本番は500語', ok: () => learned() >= 3 },
+    { id: 'gold', kind: 'badge', name: '金メダル', cond: `${WORDS.length}語すべて。名前も金色に`, real: '本番は1,000語', ok: () => learned() >= WORDS.length },
+    { id: 'fire7', kind: 'badge', name: '7日連続', cond: '7日連続', ok: () => bestNow() >= 7 }
+  ];
+  const rwById = id => REWARDS.find(r => r.id === id);
+  const rwOk = id => { const r = rwById(id); return !!(r && r.ok()); };
+  const frameNow = () => (rwOk(state.reward.frame) ? state.reward.frame : '');
+  const badgeNow = () => (rwOk(state.reward.badge) ? state.reward.badge : '');
+  const initial = () => (state.user.name.trim()[0] || 'S').toUpperCase();
+  const avatarHtml = (frame = frameNow(), letter = initial()) => `<div class="avatar">${esc(letter)}</div><i class="ring"></i>${frame === 'crown' ? '<svg class="deco"><use href="#i-crown"/></svg>' : '<i class="deco"></i>'}`;
+  const badgeHtml = (id = badgeNow()) => !id ? '' : id === 'fire7' ? `<span class="badge fire7" title="7日連続"><svg aria-hidden="true"><use href="#i-flame"/></svg><b>7</b></span>` : `<span class="badge ${id}" title="${rwById(id).name}"><svg aria-hidden="true"><use href="#i-medal"/></svg></span>`;
+  const setAvatar = (el, frame = frameNow()) => { el.dataset.frame = frame; el.innerHTML = avatarHtml(frame); };
+  // 称号: 覚えた語数と連続日数で上がっていく
+  const titleNow = () => { const n = learned(); const b = bestNow(); if (n >= WORDS.length) return 'Word Sphere マスター'; if (n >= 3 || b >= 7) return 'ことばの探検家'; if (n >= 1 || b >= 3) return 'ことばの旅人'; return 'はじめの一歩'; };
+  // まだ知らせていない、新しく手に入ったごほうび
+  if (!log.unlocked) { log.unlocked = {}; REWARDS.forEach(r => { if (r.ok()) log.unlocked[r.id] = 1; }); }
+  const newRewards = () => REWARDS.filter(r => r.ok() && !log.unlocked[r.id]);
+  const todayCount = () => log.days[dayKey()] || 0;
+  // 手に入れたごほうびは、すぐつけて見せる（Progress でいつでも付け替えられる）
+  const claimRewards = () => {
+    const fresh = newRewards();
+    fresh.forEach(r => { log.unlocked[r.id] = 1; if (r.kind === 'frame') state.reward.frame = r.id; else state.reward.badge = r.id; });
+    if (fresh.length) save();
+    return fresh;
+  };
+  const cheerReward = r => cheer(`ごほうび「${r.name}」を手に入れた！`, `${r.kind === 'frame' ? 'アイコンのまわりに飾りがつきました' : '名前のうしろにバッジがつきました'}。Progress の「ごほうび」で、いつでも付け替えられます。`);
 
   /* ---------- speech ---------- */
   const speakWord = (text, btn) => {
@@ -1497,8 +1657,11 @@
     drawMosaic();
   };
   const renderProfile = () => {
-    $('#me-name').textContent = state.user.name; $('#me-mail').textContent = state.user.email; $('#me-plan').textContent = state.user.plan;
-    $('#me-av').textContent = (state.user.name.trim()[0] || 'S').toUpperCase();
+    $('#me-name').textContent = state.user.name; $('#me-plan').textContent = state.user.plan;
+    $('#me-name').classList.toggle('gold', badgeNow() === 'gold');
+    $('#me-badge').innerHTML = badgeHtml(); $('#me-title').textContent = titleNow();
+    setAvatar($('#me-avw'));
+    renderRewards();
     const counts = { ok: 0, warn: 0, no: 0 };
     Object.values(state.ratings).forEach(r => { if (counts[r] !== undefined) counts[r]++; });
     const total = counts.ok + counts.warn + counts.no || 1;
@@ -1509,11 +1672,16 @@
     const nextS = STREAK_MS.find(n => n > st) || st + 10;
     const week = [];
     for (let n = 6; n >= 0; n--) { const d = addDays(new Date(), -n); week.push(`<li class="${log.days[dayKey(d)] ? 'on' : ''}${n === 0 ? ' today' : ''}"><span>${WD[d.getDay()]}</span><i></i></li>`); }
-    $('#streak').innerHTML = `<div class="st-top"><svg class="st-flame${today ? '' : ' off'}" aria-hidden="true"><use href="#i-flame"/></svg><div class="st-num"><b>${st}</b><span>日連続</span></div><div class="st-side"><span>自己ベスト ${best}日</span><span class="st-today${today ? ' done' : ''}">${today ? '今日の分 達成' : '今日はまだ'}</span></div></div><ol class="st-week">${week.join('')}</ol><p class="st-msg">${today ? `あと${nextS - st}日で${nextS}日連続。この調子です。` : '今日は1語だけでも大丈夫。Test か TikTak で仕分けると、連続がつながります。'}</p>`;
+    const tc = todayCount(); const goal = state.reward.goal;
+    const mid = new Date(); mid.setHours(24, 0, 0, 0); const leftMin = Math.max(0, Math.floor((mid - Date.now()) / 60000));
+    const risk = !today && st > 0;
+    $('#streak').classList.toggle('risk', risk);
+    const goalHtml = `<div class="st-goal"><span class="gk">今日の目標</span><span class="gv"><b>${Math.min(tc, goal)}</b> / ${goal}語</span><div class="bar"><i style="width:${Math.min(100, tc / goal * 100).toFixed(0)}%"></i></div><div class="seg" role="group" aria-label="1日の目標の語数">${[5, 10, 20].map(n => `<button class="seg-btn" type="button" data-goal="${n}" aria-pressed="${n === goal}">${n}語</button>`).join('')}</div></div>`;
+    $('#streak').innerHTML = `<div class="st-top"><svg class="st-flame${today ? '' : ' off'}" aria-hidden="true"><use href="#i-flame"/></svg><div class="st-num"><b>${st}</b><span>日連続</span></div><div class="st-side"><span>自己ベスト ${best}日</span><span class="st-today${today ? ' done' : ''}">${today ? '今日の分 達成' : '今日はまだ'}</span></div></div><ol class="st-week">${week.join('')}</ol><p class="st-msg">${today ? `あと${nextS - st}日で${nextS}日連続。この調子です。` : risk ? `<span class="risk">あと<b>${Math.floor(leftMin / 60)}時間${leftMin % 60}分</b>で、${st}日連続が0日に戻ります。</span>1語だけでも大丈夫。Test か TikTak で仕分けると、つながります。` : '今日は1語だけでも大丈夫。Test か TikTak で仕分けると、連続がはじまります。'}</p>${goalHtml}`;
     // これまでの学習記録
     const days = Object.keys(log.days); const t = log.tests; const last = t[t.length - 1]; const prev = t[t.length - 2];
     const delta = last && prev ? last.pct - prev.pct : 0;
-    $('#stats').innerHTML = `<div class="stat"><span class="k">これまで覚えた単語</span><b>${counts.ok}<small>/ ${WORDS.length}語</small></b><span class="d">もう少し ${counts.warn}・全然 ${counts.no}</span></div>
+    $('#stats').innerHTML = `<div class="stat"><span class="k">これまで覚えた単語</span><b>${counts.ok}<small>/ ${WORDS.length}語</small></b><span class="d">惜しい ${counts.warn}・わからない ${counts.no}</span></div>
       <div class="stat"><span class="k">学習した日数</span><b>${days.length}<small>日</small></b><span class="d">今月 ${days.filter(k => k.startsWith(monthKey())).length}日</span></div>
       <div class="stat"><span class="k">連続学習記録</span><b>${st}<small>日</small></b><span class="d">自己ベスト ${best}日</span></div>
       <div class="stat"><span class="k">テストの正答率</span><b>${last ? last.pct : 0}<small>%</small></b><span class="d${delta > 0 ? ' up' : ''}">${last && prev ? `前回より ${delta >= 0 ? '+' : ''}${delta}ポイント` : 'テストをすると記録されます'}</span></div>`;
@@ -1526,7 +1694,27 @@
     $('#demo-note').hidden = !log.demo;
     renderSpecial();
   };
+  const renderRewards = () => {
+    const got = REWARDS.filter(r => r.ok()).length;
+    $('#rw-count').textContent = `${got} / ${REWARDS.length}`;
+    const tile = r => {
+      const ok = r.ok(); const on = ok && (r.kind === 'frame' ? frameNow() : badgeNow()) === r.id;
+      const look = r.kind === 'frame' ? `<div class="av-wrap" data-frame="${r.id}" aria-hidden="true">${avatarHtml(r.id)}</div>` : badgeHtml(r.id);
+      return `<button class="rw${ok ? '' : ' locked'}" type="button" data-rw="${r.id}" aria-pressed="${on}" aria-label="${r.name}（${ok ? (on ? 'つけている' : 'タップでつける') : r.cond + 'で手に入る'}）">${ok ? '' : '<svg class="lk" aria-hidden="true"><use href="#i-lock"/></svg>'}${look}<span class="rn">${r.name}</span><span class="rc">${ok ? (on ? 'タップで外す' : 'タップでつける') : esc(r.cond)}</span></button>`;
+    };
+    $('#rewards').innerHTML = `<div><p class="rw-k">アイコンのまわり</p><div class="rw-row">${REWARDS.filter(r => r.kind === 'frame').map(tile).join('')}</div></div><div><p class="rw-k">名前のうしろ</p><div class="rw-row">${REWARDS.filter(r => r.kind === 'badge').map(tile).join('')}</div></div><p class="rw-note">いまの称号は「${titleNow()}」。覚えた単語と連続日数で上がります。デモは6語なので、語数の節目を小さくしています（銅＝本番100語・銀＝500語・金と王冠＝1,000語の想定）。</p>`;
+  };
   $('#view-profile').addEventListener('click', e => {
+    const rw = e.target.closest('[data-rw]');
+    if (rw) {
+      const r = rwById(rw.dataset.rw); buzz(8);
+      if (!r.ok()) { toast(`「${r.name}」は ${r.cond} で手に入ります`); return; }
+      const k = r.kind === 'frame' ? 'frame' : 'badge';
+      state.reward[k] = state.reward[k] === r.id ? 'none' : r.id; save(); renderProfile();
+      return;
+    }
+    const g = e.target.closest('[data-goal]');
+    if (g) { state.reward.goal = +g.dataset.goal; save(); renderProfile(); buzz(6); return; }
     if (e.target.closest('#cheer-demo')) cheer('7日連続、達成！', '毎日つづけられる人が、いちばん強い。今日もアプリを開いたあなたは、昨日のあなたより確実に前へ進んでいます。');
   });
   $('#sp-add').addEventListener('click', () => {
@@ -1636,7 +1824,7 @@
     $$('[data-torder]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.torder === pf.order)));
     $('#t-dir-note').textContent = TDIR_NOTE[pf.dir]; $('#t-order-note').textContent = TORDER_NOTE[pf.order];
     const n = testPool().length;
-    $('#t-count').textContent = n ? `${n}語を出題します` : '出題する単語がありません（全部「覚えた」になっています）';
+    $('#t-count').textContent = n ? `${n}語を出題します` : '出題する単語がありません（全部「わかった」になっています）';
     $('#t-start').disabled = !n;
   };
   const showSetup = () => { test.mini = false; testView.dataset.mode = 'setup'; $('#t-sub').textContent = '出題の内容を選んで、スタート'; renderSetup(); };
@@ -1702,22 +1890,93 @@
     $('#t-review').hidden = state.ratings[id] !== 'ok';
     $('#t-progress').textContent = `${test.i + 1} / ${test.queue.length}`;
   };
+  // リザルト画面（10/29）: 今日の結果を1枚のカードに。称号・ごほうび・連続日数・1日の目標まで入れて、そのまま SNS に出せる
+  const RS_R = 38; const RS_C = 2 * Math.PI * RS_R;
+  let lastResult = null;
+  const jaDate = (d = new Date()) => `${d.getMonth() + 1}/${d.getDate()}（${WD[d.getDay()]}）`;
+  const renderResult = r => {
+    const st = streakNow(); const tc = todayCount(); const goal = state.reward.goal; const n = learned();
+    lastResult = { ...r, st, tc, goal, n, title: titleNow(), name: state.user.name, frame: frameNow(), badge: badgeNow() };
+    const off = RS_C * (1 - r.pct / 100);
+    $('#rs-card').innerHTML = `<div class="rs-top"><svg aria-hidden="true"><use href="#i-monkey"/></svg>さる単<span>${jaDate()}の${r.mini ? 'ミニテスト' : 'テスト'}</span></div>
+      <div class="rs-who"><div class="av-wrap" data-frame="${lastResult.frame}" aria-hidden="true">${avatarHtml()}</div><div><b><span class="nm${lastResult.badge === 'gold' ? ' gold' : ''}">${esc(state.user.name)}</span>${badgeHtml()}</b><span class="title-chip">${esc(lastResult.title)}</span></div></div>
+      <div class="rs-main"><svg class="rs-ring" viewBox="0 0 92 92" role="img" aria-label="正答率 ${r.pct}%"><defs><linearGradient id="rs-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ac8ff"/><stop offset="1" stop-color="#46e0a2"/></linearGradient></defs><circle class="bg" cx="46" cy="46" r="${RS_R}"/><circle class="fg" cx="46" cy="46" r="${RS_R}" stroke-dasharray="${RS_C.toFixed(1)}" stroke-dashoffset="${RM ? off.toFixed(1) : RS_C.toFixed(1)}"/><text x="46" y="53" text-anchor="middle">${r.pct}%</text></svg><div><span class="lbl">「わかった」の割合</span><span class="big">${r.total}語中 ${r.ok}語<br>わかった</span></div></div>
+      <div class="counts" id="done-counts"><div><b style="color:#46e0a2">${r.ok}</b><span>わかった</span></div><div><b style="color:#ffc857">${r.warn}</b><span>惜しい</span></div><div><b style="color:#ff6b8b">${r.no}</b><span>わからない</span></div></div>
+      <div class="rs-stats"><div><b>${st}日</b>連続</div><div><b>${n}語</b>覚えた単語</div><div><b>${Math.min(tc, goal)}/${goal}</b>今日の目標</div></div>
+      ${r.fresh.length ? `<div class="rs-new">新しいごほうび：${r.fresh.map(x => x.name).join('・')}</div>` : ''}`;
+    if (!RM) requestAnimationFrame(() => requestAnimationFrame(() => { const fg = $('#rs-card .fg'); if (fg) fg.style.strokeDashoffset = off.toFixed(1); }));
+    // 「もう少し続けたい」「明日も開きたい」へつなぐ一言
+    $('#rs-next').textContent = tc < goal ? `あと${goal - tc}語で、今日の目標（${goal}語）に届きます。もう一回いけそうです。` : `今日の目標は達成。明日も開くと${st + 1}日連続です。`;
+  };
+  // 結果カードを画像にする（1080×1350・SNS の縦長にそのまま載る大きさ）
+  const drawShare = r => {
+    const W = 1080; const H = 1350; const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const c = cv.getContext('2d'); const F = '"Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", sans-serif'; const FS = `"Sora", ${F}`;
+    const g = c.createLinearGradient(0, 0, W * .4, H); g.addColorStop(0, '#13214d'); g.addColorStop(1, '#050914'); c.fillStyle = g; c.fillRect(0, 0, W, H);
+    const glow = (x, y, rad, col) => { const rg = c.createRadialGradient(x, y, 0, x, y, rad); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = rg; c.fillRect(0, 0, W, H); };
+    glow(W * .9, 80, 620, 'rgba(155,107,255,.42)'); glow(60, H - 80, 620, 'rgba(90,200,255,.3)');
+    // おさるさんのマーク（アイコンと同じ形）
+    const mark = (x, y, size, col) => { c.save(); c.translate(x, y); c.scale(size / 48, size / 48); c.fillStyle = col; $$('#i-monkey path').forEach(pth => c.fill(new Path2D(pth.getAttribute('d')), pth.getAttribute('fill-rule') === 'evenodd' ? 'evenodd' : 'nonzero')); c.beginPath(); c.ellipse(24, 34, 9.6, 8.4, 0, 0, Math.PI * 2); c.fill(); c.restore(); };
+    mark(80, 78, 84, '#f6b73c');
+    c.fillStyle = '#f3f6ff'; c.font = `800 52px ${F}`; c.textBaseline = 'middle'; c.fillText('さる単', 182, 122);
+    c.fillStyle = 'rgba(243,246,255,.6)'; c.font = `600 34px ${F}`; c.textAlign = 'right'; c.fillText(`${jaDate()}の${r.mini ? 'ミニテスト' : 'テスト'}`, W - 80, 122); c.textAlign = 'left';
+    // 名前と称号
+    c.fillStyle = 'rgba(90,200,255,1)'; c.beginPath(); c.arc(150, 300, 66, 0, Math.PI * 2); c.fill();
+    if (r.frame) { c.lineWidth = 10; c.strokeStyle = r.frame === 'crown' ? '#f6c443' : r.frame === 'xmas' ? '#2fbf6b' : r.frame === 'orbit' ? '#9b6bff' : '#ffe08a'; c.beginPath(); c.arc(150, 300, 80, 0, Math.PI * 2); c.stroke(); }
+    if (r.frame === 'crown') { c.save(); c.translate(150, 214); c.rotate(-.2); c.fillStyle = '#f6c443'; c.beginPath(); c.moveTo(-50, -10); c.lineTo(-25, 12); c.lineTo(0, -32); c.lineTo(25, 12); c.lineTo(50, -10); c.lineTo(40, 34); c.lineTo(-40, 34); c.closePath(); c.fill(); c.restore(); }
+    c.fillStyle = '#071022'; c.font = `800 60px ${FS}`; c.textAlign = 'center'; c.fillText(initial(), 150, 304); c.textAlign = 'left';
+    c.fillStyle = r.badge === 'gold' ? '#f6c443' : '#f3f6ff'; c.font = `700 50px ${F}`; c.fillText(r.name.length > 12 ? r.name.slice(0, 12) + '…' : r.name, 262, 276);
+    if (r.badge) { const bx = 262 + Math.min(560, c.measureText(r.name.length > 12 ? r.name.slice(0, 12) + '…' : r.name).width) + 36; const col = { bronze: '#c98a52', silver: '#b9c4d6', gold: '#f6c443', fire7: '#ff9a3c' }[r.badge]; c.fillStyle = col; c.beginPath(); c.arc(bx, 276, 24, 0, Math.PI * 2); c.fill(); c.fillStyle = 'rgba(0,0,0,.35)'; c.font = `800 26px ${FS}`; c.textAlign = 'center'; c.fillText(r.badge === 'fire7' ? '7' : '★', bx, 278); c.textAlign = 'left'; }
+    c.fillStyle = '#8fd6ff'; c.font = `700 34px ${F}`; c.fillText(`称号「${r.title}」`, 262, 340);
+    // 正答率のリング
+    const cx = 300; const cy = 640; const R = 175;
+    c.lineWidth = 34; c.lineCap = 'round'; c.strokeStyle = 'rgba(255,255,255,.12)'; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI * 2); c.stroke();
+    const lg = c.createLinearGradient(cx - R, cy - R, cx + R, cy + R); lg.addColorStop(0, '#5ac8ff'); lg.addColorStop(1, '#46e0a2'); c.strokeStyle = lg;
+    if (r.pct > 0) { c.beginPath(); c.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * r.pct / 100); c.stroke(); }
+    c.fillStyle = '#fff'; c.textAlign = 'center'; c.font = `800 110px ${FS}`; c.fillText(`${r.pct}%`, cx, cy + 6); c.textAlign = 'left';
+    c.fillStyle = 'rgba(243,246,255,.65)'; c.font = `600 34px ${F}`; c.fillText('「わかった」の割合', 560, 560);
+    c.fillStyle = '#fff'; c.font = `800 60px ${F}`; c.fillText(`${r.total}語中 ${r.ok}語`, 560, 640); c.fillText('わかった', 560, 716);
+    // 仕分けの内訳
+    const cols = [['わかった', r.ok, '#46e0a2'], ['惜しい', r.warn, '#ffc857'], ['わからない', r.no, '#ff6b8b']];
+    c.fillStyle = 'rgba(255,255,255,.1)'; c.fillRect(80, 880, W - 160, 2); c.fillRect(80, 1060, W - 160, 2);
+    cols.forEach(([k, v, col], i) => { const x = 80 + (W - 160) / 6 * (i * 2 + 1); c.textAlign = 'center'; c.fillStyle = col; c.font = `800 84px ${FS}`; c.fillText(String(v), x, 950); c.fillStyle = 'rgba(243,246,255,.65)'; c.font = `600 32px ${F}`; c.fillText(k, x, 1012); });
+    const st3 = [[`${r.st}日`, '連続'], [`${r.n}語`, '覚えた単語'], [`${Math.min(r.tc, r.goal)}/${r.goal}`, '今日の目標']];
+    st3.forEach(([v, k], i) => { const x = 80 + (W - 160) / 6 * (i * 2 + 1); c.fillStyle = '#fff'; c.font = `800 64px ${FS}`; c.fillText(v, x, 1140); c.fillStyle = 'rgba(243,246,255,.65)'; c.font = `600 30px ${F}`; c.fillText(k, x, 1200); });
+    c.fillStyle = 'rgba(243,246,255,.45)'; c.font = `600 28px ${F}`; c.fillText('英語学習者の、英語学習者による、英語学習者のための単語帳', W / 2, 1292); c.textAlign = 'left';
+    return cv;
+  };
+  const shareResult = async () => {
+    if (!lastResult) return;
+    buzz(8);
+    const r = lastResult;
+    const blob = await new Promise(res => drawShare(r).toBlob(res, 'image/png'));
+    const text = `さる単で${r.total}語テスト。「わかった」は${r.pct}%、${r.st}日連続で続いています。`;
+    if (blob && typeof File === 'function') {
+      const file = new File([blob], `sarutan-${dayKey()}.png`, { type: 'image/png' });
+      try { if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], text }); return; } } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    // その場でシェアできない端末（パソコンなど）では、画像を出して保存してもらう
+    if (blob) openSheet('share', { url: URL.createObjectURL(blob), text });
+  };
+  $('#rs-share').addEventListener('click', shareResult);
   const finishTest = () => {
     deck.classList.add('finished');
     $('#tprog-bar').style.width = '100%';
     const s = test.session; const total = s.ok + s.warn + s.no; const pct = total ? Math.round(s.ok / total * 100) : 0;
-    $('#done-counts').innerHTML = `<div><b style="color:var(--ok)">${s.ok}</b><span>覚えた</span></div><div><b style="color:var(--warn)">${s.warn}</b><span>もう少し</span></div><div><b style="color:var(--no)">${s.no}</b><span>全然</span></div>`;
     if (total && !test.mini) { log.tests.push({ d: dayKey(), total, ok: s.ok, pct }); if (log.tests.length > 30) log.tests.shift(); save(); }   // 復習のミニテストは正答率の記録に入れない
-    // 「もう少し」「全然」にした単語が、復習したほうがよい単語
+    const fresh = claimRewards();
+    renderResult({ total, ok: s.ok, warn: s.warn, no: s.no, pct, mini: test.mini, fresh });
+    // 「惜しい」「わからない」にした単語が、復習したほうがよい単語
     const weak = test.history.filter(h => h.label !== 'ok').map(h => h.id);
     const wasMini = test.mini;
     review.ids = weak; review.step = weak.length ? 1 : 0;
     $('#done-title').textContent = wasMini ? (weak.length ? 'ミニテスト終了' : '復習完了！') : '今日の分はおしまい';
-    $('#done-sub').textContent = wasMini && !weak.length ? '復習した単語を、全部「覚えた」にできました' : '結果は Progress の My単語帳に入りました';
+    $('#done-sub').textContent = wasMini && !weak.length ? '復習した単語を、全部「わかった」にできました' : '結果は Progress の My単語帳に入りました';
     renderReview(true);
     buzz([10, 40, 10]);
     setTimeout(() => {
-      if (pct === 100 && total >= 3 && hitMilestone('t100:' + dayKey(), '全問「覚えた」！', '全部思い出せましたね。この正確さは、毎日の積み重ねがないと出せません。胸を張ってください。')) return;
+      if (fresh.length) { cheerReward(fresh[fresh.length - 1]); return; }
+      if (pct === 100 && total >= 3 && hitMilestone('t100:' + dayKey(), '全問「わかった」！', '全部思い出せましたね。この正確さは、毎日の積み重ねがないと出せません。胸を張ってください。')) return;
       checkMilestones();
     }, RM ? 0 : 700);
   };
@@ -1741,7 +2000,7 @@
     toast('1つ戻しました');
   };
   const ascend = () => {
-    // 「覚えた」＝キラキラをまとって上へ昇天していく
+    // 「わかった」＝キラキラをまとって上へ昇天していく
     const box = document.createElement('div'); box.className = 'sparkles'; box.setAttribute('aria-hidden', 'true');
     const colors = ['#fff5c8', '#ffffff', '#46e0a2', '#ffe08a', '#a8fbe0'];
     for (let i = 0; i < 24; i++) {
@@ -1784,7 +2043,7 @@
     const dx = e.clientX - test.drag.x, dy = e.clientY - test.drag.y;
     const moved = test.drag.moved; test.drag = null;
     const horiz = Math.abs(dx) > Math.abs(dy);
-    // 仕様書（2026-09-23）: 右＝解説（仕分けしない）／左＝もう少し／上＝覚えた（昇天）／下＝全然覚えてない
+    // 仕様書（10/29）: 上＝わかった（昇天）／左＝惜しい／下＝わからない／右＝解説（仕分けしない）
     if (horiz && dx > 90) { tcard.classList.add('settle'); tcard.style.transform = ''; $$('.stamp', tcard).forEach(x => x.style.opacity = 0); showInfo(); return; }
     if (horiz && dx < -90) return flyOut(-600, dy, 'warn');
     if (!horiz && dy < -90) return flyOut(dx, -700, 'ok');
@@ -1850,12 +2109,21 @@
   // 方言モード（仕様書 10/1）: 解説と覚え方を、標準語／関西弁／名古屋弁の文面と音声で
   const dialectBar = what => `<div class="dl-bar"><div class="seg" role="group" aria-label="方言モード">${Object.keys(DIALECT_NAME).map(k => `<button class="seg-btn" type="button" data-sdialect="${k}" aria-pressed="${k === state.dialect}">${DIALECT_NAME[k]}</button>`).join('')}</div><button class="ja-say" type="button" data-say-ja="1" aria-label="${what}を音声で聞く"><svg aria-hidden="true"><use href="#i-speaker"/></svg>音声</button></div>`;
   const DIALECT_NOTE = '<p class="sh-note">方言の文面と音声はデモ用です（音声は端末の読み上げ）。本番は方言の話者の収録や AI 音声に差し替えます。</p>';
+  // 仕様書（10/1・10/29）: この単語が使われている「バイリンガール英会話」の動画を、使われている場面から、アプリの中で再生する（YouTube には飛ばさない）
+  const fmtTs = t => `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
+  const ytHtml = w => {
+    const y = YT[w.id];
+    if (!y) return `<div class="yt-box"><p class="yt-k">この単語が出てくる、ちかさんの動画</p><p class="yt-line">いま入っている動画の字幕には、まだこの単語が見つかっていません。全動画から抽出したあとで、ここで再生できるようになります。</p></div>`;
+    const start = Math.max(0, y.t - 2);
+    return `<div class="yt-box"><p class="yt-k">この単語が出てくる、ちかさんの動画<span>${fmtTs(start)} から再生</span></p><div class="yt-frame"><iframe src="https://www.youtube-nocookie.com/embed/${y.id}?start=${start}&amp;playsinline=1&amp;rel=0" title="${esc(y.title)}" loading="lazy" allow="encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div><p class="yt-line">${esc(y.line).replace(new RegExp(`\\b(${y.hit})\\b`, 'i'), '<em>$1</em>')}</p><p class="yt-title">${esc(y.title)}</p></div>`;
+  };
   const kaiText = w => (w.kaisetsuD && w.kaisetsuD[state.dialect]) || w.kaisetsu;
   const SHEETS = {
     pos: { t: '品詞の違い', c: 'var(--c-pos)', ic: 'i-doc', body: w => `<p class="sh-lead">${esc(w.word)} の仲間の形（タップで発音）</p><ul class="forms">${w.forms.map(f => `<li class="${f[0] === w.word ? 'me' : ''}"><button class="say" type="button" data-say="${esc(f[0])}">${esc(f[0])}</button><span class="pos">${esc(f[1])}</span><span class="m">${esc(f[2])}</span></li>`).join('')}</ul>` },
     syn: { t: '類義語', c: 'var(--c-syn)', ic: 'i-rings', body: w => `<p class="sh-lead">${esc(w.word)} と似た言葉と、その違い</p><ul class="syns">${w.syn.map(x => `<li><div class="top"><button class="say" type="button" data-say="${esc(x[0])}">${esc(x[0])}</button><span class="m">${esc(x[1])}</span></div><p class="diff">${esc(x[2])}</p></li>`).join('')}</ul>` },
     kaisetsu: { t: '解説', c: 'var(--c-kai)', ic: 'i-book', body: w => `<p class="sh-lead"><b>${esc(w.word)}</b>　${esc(w.meaning)}</p>${dialectBar('解説')}<div class="ja-text" id="ja-text">${kaiText(w).map(x => `<p>${esc(x)}</p>`).join('')}</div>${w.nuance ? `<div class="nuance-box"><span class="k">Nuance</span><b>${esc(w.nuance[0])}</b>　${esc(w.nuance[1])}</div>` : ''}${DIALECT_NOTE}` },
-    tips: { t: 'おさるさんの覚え方', c: 'var(--c-tips)', ic: 'i-monkey', body: w => `<p class="sh-lead">${esc(w.word)}</p>${dialectBar('覚え方')}<div class="bubble ja-text" id="ja-text">${esc(w.tips[state.dialect])}</div>${DIALECT_NOTE}` }
+    share: { t: '結果をシェア', c: 'var(--cyan)', ic: 'i-share', body: x => `<img class="sh-img" src="${x.url}" alt="今回の結果の画像"><a class="ghost-btn primary sh-save" href="${x.url}" download="sarutan-${dayKey()}.png">画像を保存する</a><p class="sh-note">この端末では直接シェアできないため、画像を保存して SNS に投稿してください。スマホでは「結果をシェア」から、そのまま Instagram や X に送れます。</p>` },
+    tips: { t: 'おさるさんの覚え方', c: 'var(--c-tips)', ic: 'i-monkey', body: w => `<p class="sh-lead">${esc(w.word)}</p>${dialectBar('覚え方')}<div class="bubble ja-text" id="ja-text">${esc(w.tips[state.dialect])}</div>${ytHtml(w)}${DIALECT_NOTE}` }
   };
   let sheetKind = null; let sheetWord = null;
   const openSheet = (k, w) => {
@@ -2027,8 +2295,8 @@
         <div class="tk-shade" aria-hidden="true"></div>
         <div class="tk-stamp" aria-hidden="true"></div>
         <div class="tk-rail">
-          <button class="tk-act rate ok" type="button" data-act="rate" data-rate="ok" aria-label="覚えた"><span class="ring">${icon('check')}</span>覚えた</button>
-          <button class="tk-act rate no" type="button" data-act="rate" data-rate="no" aria-label="全然覚えてない"><span class="ring"><svg aria-hidden="true"><use href="#i-close"/></svg></span>全然</button>
+          <button class="tk-act rate ok" type="button" data-act="rate" data-rate="ok" aria-label="わかった"><span class="ring">${icon('check')}</span>わかった</button>
+          <button class="tk-act rate no" type="button" data-act="rate" data-rate="no" aria-label="わからない"><span class="ring"><svg aria-hidden="true"><use href="#i-close"/></svg></span>わからない</button>
           <button class="tk-act" type="button" data-act="speak" aria-label="発音を聞く"><span class="ring"><svg aria-hidden="true"><use href="#i-speaker"/></svg></span>発音</button>
           <button class="tk-act" type="button" data-act="detail" aria-label="単語ページで見る"><span class="ring"><svg aria-hidden="true"><use href="#i-words"/></svg></span>詳しく</button>
         </div>
@@ -2155,7 +2423,7 @@
       const r = b.dataset.rate; const at = tk.i; const el = tkCur();
       state.ratings[w.id] = r; tk.tally[r]++; recordStudy(w.id); setTimeout(checkMilestones, RM ? 0 : 900);
       tkLayout();
-      const st = $('.tk-stamp', el); st.textContent = r === 'ok' ? '覚えた' : '全然'; st.className = 'tk-stamp ' + r; el.classList.add('stamped');
+      const st = $('.tk-stamp', el); st.textContent = r === 'ok' ? 'わかった' : 'わからない'; st.className = 'tk-stamp ' + r; el.classList.add('stamped');
       buzz(r === 'ok' ? [12, 30, 18] : 12);
       setTimeout(() => { el.classList.remove('stamped'); if (tk.active && tk.i === at) tkGo(at + 1); }, RM ? 0 : 450);
     }
