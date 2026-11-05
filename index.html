@@ -109,6 +109,7 @@
     --tab-h: 66px;
     --sw: 390px;
     --word-size: 58px;
+    container-type: size;
   }
   @media (max-width: 560px) {
     .studio { padding: 0; gap: 0; }
@@ -196,10 +197,11 @@
   /* ---------- Test ---------- */
   .tprog { height: 3px; border-radius: 2px; background: rgba(var(--ink-rgb), .12); margin: 2px 0 14px; overflow: hidden; }
   .tprog i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--violet)); transition: width .4s var(--ease); }
-  .deck { position: relative; height: 410px; }
+  /* 小林さん⑦: 背の低い画面でも、カード・十字キー・下の操作が1画面に収まる高さにする */
+  .deck { position: relative; height: clamp(260px, calc(100cqh - 352px - var(--top-inset)), 410px); }
   .tcard {
     position: absolute; left: 50%; top: 0;
-    width: min(100%, 340px); height: 380px;
+    width: min(100%, 340px); height: calc(100% - 30px);
     margin-left: min(-50%, -170px);
     border-radius: 24px;
     perspective: 1200px;
@@ -209,8 +211,9 @@
     -webkit-user-select: none;
   }
   .tcard.ghost { pointer-events: none; }
-  .tcard.g1 { transform: translateY(12px) scale(.95); }
-  .tcard.g2 { transform: translateY(24px) scale(.9); }
+  /* 小林さん⑨: 後ろのカードも同じ大きさにして、下に少しずつずらして重ねる */
+  .tcard.g1 { transform: translateY(10px); }
+  .tcard.g2 { transform: translateY(20px); }
   .tcard.g1 .face { opacity: .55; }
   .tcard.g2 .face { opacity: .3; }
   .tcard.g1 .big { opacity: .5; font-size: 34px; }
@@ -446,8 +449,7 @@
   .tk-rv .x svg { width: 12px; height: 12px; }
   .tk-rv.pulse .go { animation: pulse .6s ease-in-out infinite alternate; }
   .view.tiktak.rv .tk-top, .view.tiktak.rv .tk-hint { visibility: hidden; }
-  .detail.rv .d-hint { display: none; }
-  .rv-pill { position: absolute; left: 50%; bottom: calc(var(--bottom-inset) + 96px); z-index: 4; transform: translateX(-50%); padding: 7px 14px; border: 0; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--violet)); color: #fff; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
+  .rv-pill { padding: 12px 16px; border: 0; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--violet)); color: #fff; font-size: 11.5px; font-weight: 800; white-space: nowrap; }
 
   /* ---------- Progress（元 Profile）: 継続・学習記録・今月のスペシャル画像（仕様書 10/1） ---------- */
   .pg-head { display: flex; align-items: center; justify-content: space-between; }
@@ -507,12 +509,23 @@
   .fld input { width: 100%; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(var(--card-rgb), .35); color: var(--ink); font: inherit; font-size: 15px; }
   .plan-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border: 1px solid var(--line-soft); border-radius: 12px; color: var(--ink); font-size: 15px; }
   .acct .ghost-btn { justify-self: start; }
+  .coach { position: absolute; inset: 0; z-index: 45; display: grid; place-items: end center; padding: 16px 16px calc(var(--bottom-inset) + 20px); background: rgba(var(--bg-rgb), .82); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fade .25s; }
+  .coach[hidden] { display: none; }
+  .coach-card { width: 100%; max-width: 360px; padding: 18px 18px 16px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(180deg, var(--sheet-1), var(--sheet-2)); box-shadow: 0 20px 50px var(--shadow); animation: rise .35s var(--ease); }
+  .coach-fig { display: grid; place-items: center; margin-bottom: 10px; }
+  .coach-fig svg { width: 100%; max-width: 220px; height: auto; }
+  .coach-fig text { font-family: var(--font); font-weight: 700; }
+  .coach h3 { margin: 0 0 8px; font-size: 18px; font-weight: 800; }
+  .coach-list { display: grid; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; font-size: 14px; line-height: 1.6; }
+  .coach-list li { display: grid; grid-template-columns: 22px 1fr; gap: 6px; }
+  .coach-list i { display: grid; place-items: center; width: 22px; height: 22px; margin-top: 1px; border-radius: 50%; background: rgba(var(--accent-rgb), .18); color: var(--cyan); font-size: 12px; font-style: normal; font-weight: 800; }
+  .coach-ok { display: block; width: 100%; padding: 13px 0; font-size: 15px; }
   .cheer { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; padding: 24px; overflow: hidden; background: rgba(var(--bg-rgb), .88); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fade .25s; }
   .cheer[hidden] { display: none; }
   .cheer-card { position: relative; z-index: 2; max-width: 300px; text-align: center; }
   .cheer-mark { width: 104px; height: 104px; color: var(--mark); filter: drop-shadow(0 10px 30px rgba(246, 183, 60, .5)); animation: cheerPop .7s var(--pop) both; }
   .cheer h3 { margin: 10px 0 6px; font-size: 26px; font-weight: 800; line-height: 1.3; }
-  .cheer p { margin: 0 0 18px; font-size: 14px; line-height: 1.75; color: var(--ink-2); }
+  .cheer p { margin: 0 0 20px; font-size: 16px; font-weight: 600; line-height: 1.8; color: var(--ink); }
   .confetti { position: absolute; inset: 0; pointer-events: none; }
   .confetti i { position: absolute; top: -24px; left: var(--x); width: var(--s); height: calc(var(--s) * 1.6); border-radius: 2px; background: var(--c); animation: confetti var(--t) var(--d) cubic-bezier(.2, .6, .4, 1) forwards; }
   @keyframes confetti { to { transform: translate(var(--dx), 960px) rotate(var(--r)); } }
@@ -693,7 +706,8 @@
   .d-exja { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); }
   .monkey { position: absolute; left: 50%; bottom: calc(var(--bottom-inset) + 18px); transform: translateX(-50%); z-index: 4; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 0; background: none; border: 0; color: var(--c-tips); font-size: 11px; font-weight: 700; }
   .monkey svg { color: var(--mark); width: 52px; height: 52px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); animation: float 3.6s ease-in-out infinite; }
-  .d-hint { position: absolute; left: 0; right: 0; bottom: calc(var(--bottom-inset) + 104px); margin: 0; text-align: center; font-size: 11px; color: var(--ink-3); pointer-events: none; }
+  .d-bottom { position: absolute; left: 50%; bottom: calc(var(--bottom-inset) + 92px); z-index: 4; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; }
+  .d-close { width: 44px; height: 44px; }
   .arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: rgba(var(--card-rgb), .6); display: grid; place-items: center; color: var(--ink); }
   .arrow svg { width: 18px; height: 18px; }
   .arrow.prev { left: 6px; }
@@ -704,6 +718,8 @@
   .sheet-scrim { position: absolute; inset: 0; background: var(--scrim); animation: fade .2s; }
   .sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 78%; overflow-y: auto; padding: 16px 20px calc(var(--bottom-inset) + 26px); border-top: 3px solid var(--c); border-radius: 24px 24px 0 0; background: linear-gradient(180deg, var(--sheet-1), var(--sheet-2)); box-shadow: 0 -20px 50px rgba(0, 0, 0, .5); animation: sheetUp .32s var(--ease); }
   .sheet-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  /* 小林さん⑩⑬: 閉じる操作を親指の届く下にも置く（右上の × は残す） */
+  .sheet-done { position: sticky; bottom: 0; z-index: 2; display: block; width: 100%; margin-top: 14px; padding: 13px 0; border: 1px solid var(--line); border-radius: 14px; background: var(--sheet-2); box-shadow: 0 -10px 20px var(--sheet-2); color: var(--ink); font-size: 15px; font-weight: 700; }
   .sheet-head h2 { flex: 1; margin: 0; font-size: 18px; font-weight: 800; }
   .sheet-ic { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: var(--c); background: rgba(255, 255, 255, .06); }
   .sheet-ic svg { width: 24px; height: 24px; }
@@ -728,9 +744,9 @@
   .sphere { position: absolute; inset: 0; z-index: 25; display: flex; overflow-y: auto; flex-direction: column; padding: calc(var(--top-inset) - 2px) 12px calc(var(--bottom-inset) + 14px); background: radial-gradient(90% 60% at 50% 48%, var(--glow), var(--bg) 75%); animation: slideIn .3s var(--ease); }
   .sphere[hidden] { display: none; }
   .sp-head { display: flex; align-items: center; gap: 10px; }
-  .sp-brand { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; line-height: 1.1; }
-  .sp-brand svg { width: 32px; height: 32px; color: var(--mark); }
-  .sp-brand small { display: block; font-size: 10px; font-weight: 500; letter-spacing: .06em; color: var(--ink-3); }
+  .sp-head { justify-content: space-between; }
+  .sp-label { padding-right: 6px; font-size: 13px; font-weight: 700; color: var(--c-core); }
+  .sp-done { flex: none; margin-top: 12px; background: var(--bg-2); box-shadow: none; }
   .sp-map { position: relative; flex: 1 0 530px; margin-top: 6px; }
   .sp-lines { position: absolute; inset: 0; width: 100%; height: 100%; }
   .sp-lines line { stroke: rgba(var(--accent-rgb), .4); stroke-width: 1.2; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
@@ -1105,6 +1121,7 @@
           <p class="sec-title">デモ用</p>
           <div class="rows">
             <button class="arow" type="button" id="replay-open"><span>起動の演出をもう一度見る</span><svg aria-hidden="true"><use href="#i-right"/></svg></button>
+            <button class="arow" type="button" id="coach-reset"><span>操作の説明をもう一度出す</span><svg aria-hidden="true"><use href="#i-right"/></svg></button>
             <button class="arow" type="button" id="log-reset"><span>学習記録を最初の状態に戻す</span><svg aria-hidden="true"><use href="#i-right"/></svg></button>
           </div>
         </section>
@@ -1139,6 +1156,16 @@
 
       <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+      <!-- 小林さん⑪: はじめて使う画面では、操作の前に説明を出す -->
+      <div class="coach" id="coach" hidden role="dialog" aria-modal="true" aria-labelledby="coach-title">
+        <div class="coach-card">
+          <div class="coach-fig" id="coach-fig" aria-hidden="true"></div>
+          <h3 id="coach-title">使い方</h3>
+          <ul class="coach-list" id="coach-list"></ul>
+          <button class="ghost-btn primary coach-ok" type="button" id="coach-ok">はじめる</button>
+        </div>
+      </div>
+
       <!-- 節目でほめる演出 -->
       <div class="cheer" id="cheer" hidden role="dialog" aria-modal="true" aria-labelledby="cheer-title">
         <div class="confetti" id="confetti" aria-hidden="true"></div>
@@ -1159,7 +1186,6 @@
         <button class="corner bl" type="button" data-corner="bl"><span class="c-in"><svg class="c-ic" aria-hidden="true"><use href="#i-bulb"/></svg>コアイメージ<svg class="c-ar" aria-hidden="true"><use href="#i-left"/></svg></span></button>
         <button class="corner br" type="button" data-corner="br"><span class="c-in"><svg class="c-ic" aria-hidden="true"><use href="#i-book"/></svg>解説<svg class="c-ar" aria-hidden="true"><use href="#i-right"/></svg></span></button>
         <div class="d-top">
-          <button class="icon-btn" type="button" data-act="close" aria-label="閉じる"><svg><use href="#i-close"/></svg></button>
           <span class="d-count" id="d-count"></span>
         </div>
         <div class="d-center" id="d-center">
@@ -1175,8 +1201,11 @@
           <p class="d-ex"><span id="d-ex"></span><button class="ex-say" type="button" data-act="speak-ex" aria-label="例文を聞く"><svg aria-hidden="true"><use href="#i-speaker"/></svg></button></p>
           <p class="d-exja" id="d-exja"></p>
         </div>
-        <p class="d-hint">四隅をタップ ／ 斜めに引く</p>
-        <button class="rv-pill" type="button" id="d-rv" hidden aria-label="復習 2/3。ミニテストへ進む">ミニテストへ →</button>
+        <!-- 小林さん⑫: 画面の真上は押しにくいので、閉じるはおさるさんの上へ -->
+        <div class="d-bottom">
+          <button class="icon-btn d-close" type="button" data-act="close" aria-label="単語ページを閉じる"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          <button class="rv-pill" type="button" id="d-rv" hidden aria-label="復習 2/3。ミニテストへ進む">ミニテストへ →</button>
+        </div>
         <button class="monkey" type="button" data-act="tips" aria-label="おさるさんの覚え方"><svg aria-hidden="true"><use href="#i-monkey"/></svg>Tips</button>
         <button class="arrow prev" type="button" data-act="prev" aria-label="前の単語"><svg><use href="#i-left"/></svg></button>
         <button class="arrow next" type="button" data-act="next" aria-label="次の単語"><svg><use href="#i-right"/></svg></button>
@@ -1186,13 +1215,14 @@
       <!-- コアイメージ（別ページ） -->
       <section class="sphere" id="sphere" hidden aria-labelledby="sp-title">
         <header class="sp-head">
-          <button class="icon-btn" type="button" data-sp="close" aria-label="戻る"><svg><use href="#i-left"/></svg></button>
-          <div class="sp-brand"><svg aria-hidden="true"><use href="#i-monkey"/></svg><span>さる単<small>Word Sphere</small></span></div>
+          <button class="back sp-back" type="button" data-sp="close"><svg aria-hidden="true"><use href="#i-left"/></svg>戻る</button>
+          <span class="sp-label">コアイメージ</span>
         </header>
         <h2 class="sr-only" id="sp-title">コアイメージ</h2>
         <div class="sp-map" id="sp-map"></div>
         <div class="sp-ety" id="sp-ety"></div>
         <p class="sp-tag">ひとつの単語から、ことばの世界が広がる。</p>
+        <button class="sheet-done sp-done" type="button" data-sp="close">単語ページに戻る</button>
       </section>
 
       <!-- 四隅のポップアップ -->
@@ -1201,6 +1231,7 @@
         <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
           <div class="sheet-head"><span class="sheet-ic" id="sheet-ic"></span><h2 id="sheet-title">解説</h2><button class="icon-btn sheet-close" type="button" data-sheet="close" aria-label="閉じる"><svg><use href="#i-close"/></svg></button></div>
           <div class="sheet-body" id="sheet-body"></div>
+          <button class="sheet-done" type="button" data-sheet="close">閉じる</button>
         </div>
       </div>
     </div>
@@ -1413,6 +1444,7 @@
     user: { name: 'さる単ユーザー', email: 'demo@example.com', plan: 'メンバー' },
     testPrefs: { scope: 'all', dir: 'en', order: 'random' },
     reward: { frame: 'glow', badge: 'fire7', goal: 10 },
+    coach: { detail: false, test: false },
     log: null };
   try {
     const saved = JSON.parse(localStorage.getItem(KEY) || '{}');
@@ -1423,10 +1455,11 @@
     if (saved.user) Object.assign(state.user, saved.user);
     if (saved.testPrefs) Object.assign(state.testPrefs, saved.testPrefs);
     if (saved.reward) Object.assign(state.reward, saved.reward);
+    if (saved.coach) Object.assign(state.coach, saved.coach);
     if (saved.log && saved.log.days) state.log = saved.log;
   } catch (e) { /* storage unavailable: run from defaults */ }
   const save = () => {
-    try { localStorage.setItem(KEY, JSON.stringify({ dialect: state.dialect, notify: state.notify, theme: state.theme, ratings: state.ratings, user: state.user, testPrefs: state.testPrefs, reward: state.reward, log: state.log })); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ dialect: state.dialect, notify: state.notify, theme: state.theme, ratings: state.ratings, user: state.user, testPrefs: state.testPrefs, reward: state.reward, coach: state.coach, log: state.log })); } catch (e) { /* ignore */ }
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -1769,6 +1802,7 @@
   $$('[data-theme-opt]').forEach(b => b.addEventListener('click', () => { setTheme(b.dataset.themeOpt); toast({ dark: 'ダークモードにしました', light: 'ライトモードにしました', auto: '端末の設定に合わせます' }[state.theme]); }));
   $('#theme-quick').addEventListener('click', () => { setTheme(themeNow() === 'light' ? 'dark' : 'light'); buzz(8); });
   $('#replay-open').addEventListener('click', () => playOpening());
+  $('#coach-reset').addEventListener('click', () => { state.coach.detail = false; state.coach.test = false; save(); toast('次に単語ページと Test を開いたとき、説明が出ます'); });
   $('#log-reset').addEventListener('click', () => {
     state.ratings = {}; state.log = seedLog(); log = state.log; log.unlocked = {}; REWARDS.forEach(r => { if (r.ok()) log.unlocked[r.id] = 1; }); state.reward.frame = 'glow'; state.reward.badge = 'fire7'; save(); renderAccount(); toast('学習記録を最初の状態に戻しました');
   });
@@ -1850,6 +1884,7 @@
     $('#t-sub').textContent = (mini ? '復習 3/3・ミニテスト。' : '') + (state.testPrefs.dir === 'ja' ? 'タップで英語。十字キーの向きにスワイプ' : 'タップで意味。十字キーの向きにスワイプ');
     deck.classList.remove('finished');
     showCard();
+    showCoach('test');
   };
   $$('[data-tscope]').forEach(b => b.addEventListener('click', () => { state.testPrefs.scope = b.dataset.tscope; save(); renderSetup(); }));
   $$('[data-tdir]').forEach(b => b.addEventListener('click', () => { state.testPrefs.dir = b.dataset.tdir; save(); renderSetup(); }));
@@ -2077,7 +2112,7 @@
   $('#t-speak').addEventListener('click', e => { e.stopPropagation(); const id = test.queue[test.i]; if (id) speakWord(byId(id).word, e.currentTarget); });
   $('#t-more').addEventListener('click', () => { const id = test.queue[test.i]; if (id) openDetail(WORDS, WORDS.findIndex(w => w.id === id)); });
   document.addEventListener('keydown', e => {
-    if (state.tab !== 'test' || testView.dataset.mode !== 'play' || !detailEl.hidden || !sheetEl.hidden || !cheerEl.hidden || deck.classList.contains('finished')) return;
+    if (state.tab !== 'test' || testView.dataset.mode !== 'play' || !detailEl.hidden || !sheetEl.hidden || !cheerEl.hidden || !coachEl.hidden || deck.classList.contains('finished')) return;
     if (e.key === 'ArrowRight') showInfo();
     else if (e.key === 'ArrowLeft') flyOut(-600, 0, 'warn');
     else if (e.key === 'ArrowUp') { e.preventDefault(); flyOut(0, -700, 'ok'); }
@@ -2085,6 +2120,31 @@
     else if (e.key === ' ') { e.preventDefault(); test.flipped = !test.flipped; tcard.classList.toggle('flipped', test.flipped); }
   });
   showSetup();
+
+  /* ---------- 操作の説明（小林さん⑪）: 単語ページと Test を、はじめて開いたときに一度だけ ---------- */
+  const COACH = {
+    detail: {
+      title: '単語ページの使い方',
+      fig: `<svg viewBox="0 0 220 150"><rect x="50" y="4" width="120" height="142" rx="16" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="2"/><path d="M50 40a36 36 0 0 0 36-36H66a16 16 0 0 0-16 16z" fill="var(--c-pos)" stroke="#fff" stroke-width="2"/><path d="M170 40a36 36 0 0 1-36-36h20a16 16 0 0 1 16 16z" fill="var(--c-syn)" opacity=".4"/><path d="M50 110a36 36 0 0 1 36 36H66a16 16 0 0 1-16-16z" fill="var(--c-core)" opacity=".4"/><path d="M170 110a36 36 0 0 0-36 36h20a16 16 0 0 0 16-16z" fill="var(--c-kai)" opacity=".4"/><path d="M108 80l34 34M134 114h8v-8" stroke="var(--cyan)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="108" cy="80" r="8" fill="var(--cyan)" opacity=".85"/><text x="56" y="56" font-size="11" fill="currentColor">↖ ここが開く</text><text x="6" y="22" font-size="11" fill="var(--c-pos)">品詞</text><text x="174" y="22" font-size="11" fill="var(--c-syn)">類義語</text><text x="2" y="142" font-size="11" fill="var(--c-core)">コア</text><text x="174" y="142" font-size="11" fill="var(--c-kai)">解説</text></svg>`,
+      items: ['四隅をタップすると開きます。左上＝品詞の違い、右上＝類義語、左下＝コアイメージ、右下＝解説', '指で斜めに引っぱっても開きます。地図をずらすように、引いた向きの反対側の角が開きます（右下へ引く→左上）', '左右に払うと、前後の単語へ', '下のおさるさんで、覚え方とちかさんの動画']
+    },
+    test: {
+      title: 'Test の使い方',
+      fig: `<svg viewBox="0 0 220 150"><rect x="78" y="40" width="64" height="70" rx="10" fill="rgba(var(--accent-rgb), .15)" stroke="var(--cyan)" stroke-width="1.5"/><text x="110" y="80" text-anchor="middle" font-size="13" fill="currentColor">word</text><path d="M110 34V12M104 18l6-6 6 6" stroke="var(--ok)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M110 116v22M104 132l6 6 6-6" stroke="var(--no)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M72 75H50M56 69l-6 6 6 6" stroke="var(--warn)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M148 75h22M164 69l6 6-6 6" stroke="var(--c-kai)" stroke-width="2.5" fill="none" stroke-linecap="round"/><text x="122" y="16" font-size="11" fill="var(--ok)">わかった</text><text x="122" y="146" font-size="11" fill="var(--no)">わからない</text><text x="4" y="66" font-size="11" fill="var(--warn)">惜しい</text><text x="176" y="66" font-size="11" fill="var(--c-kai)">解説</text></svg>`,
+      items: ['カードをタップすると、意味（裏）が見られます', '上へ＝わかった、左へ＝惜しい、下へ＝わからない', '右へ＝解説を見る（仕分けはしない）', 'カードの下の十字キーが目印です']
+    }
+  };
+  const coachEl = $('#coach');
+  let coachKind = null;
+  const showCoach = k => {
+    if (state.coach[k]) return false;
+    const c = COACH[k]; coachKind = k;
+    $('#coach-fig').innerHTML = c.fig; $('#coach-title').textContent = c.title;
+    $('#coach-list').innerHTML = c.items.map((t, i) => `<li><i>${i + 1}</i><span>${esc(t)}</span></li>`).join('');
+    coachEl.hidden = false; $('#coach-ok').focus({ preventScroll: true });
+    return true;
+  };
+  $('#coach-ok').addEventListener('click', () => { if (coachKind) { state.coach[coachKind] = true; save(); } coachEl.hidden = true; coachKind = null; buzz(6); });
 
   /* ---------- 単語ページ: 中央＋四隅（仕様書 2026-09-23） ---------- */
   const detailEl = $('#detail');
@@ -2213,6 +2273,7 @@
     detail.list = list; detailEl.hidden = false;
     showWord(Math.max(0, i));
     $('[data-act="close"]', detailEl).focus({ preventScroll: true });
+    showCoach('detail');
   };
   const closeDetail = () => {
     closeSheet(); sphereEl.hidden = true;
